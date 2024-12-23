@@ -1,0 +1,26 @@
+{
+    // Use o IntelliSense para saber mais sobre os atributos possíveis.
+    // Focalizar para exibir as descrições dos atributos existentes.
+    // Para obter mais informações, acesse: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [ {
+        "name": "Run Default",
+        "type": "go",
+        "request": "launch",
+        "mode": "debug",
+        "program": "${workspaceRoot}/cmd/api-server",
+        "env": {
+            "CONF": "../../configs/default.yaml,../../configs/rest.yaml,../../configs/worker/development.yaml",
+            "A_C":"B"
+        },
+        "args": [],
+        "showLog": false
+    },
+    {
+        "name": "Launch Package",
+        "type": "go",
+        "request": "launch",
+        "mode": "auto",
+        "program": "${fileDirname}"
+    }]
+}

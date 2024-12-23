@@ -1,0 +1,8 @@
+ignite:
+  log:
+    type: ZEROLOG
+  zerolog:
+    level: WARN
+    formatter: JSON
+    console:
+      enabled: true

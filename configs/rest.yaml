@@ -1,0 +1,24 @@
+app:
+  server: rest
+
+ignite:
+  fiber:
+    port: 8080
+    config:
+      disableKeepalive: false
+      reduceMemoryUsage: true
+      concurrency: 64000
+      idleTimeout: '5s'
+    plugins:
+      logger:
+        enabled: true
+      datadog:
+        enabled: true
+      prometheus:
+        enabled: true
+      recover:
+        enabled: true
+      health:
+        enabled: true
+      status:
+        enabled: true

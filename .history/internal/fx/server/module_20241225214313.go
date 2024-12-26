@@ -4,7 +4,7 @@ import (
 	modules "project-golang/internal/fx/modules"
 
 
-	worker "project-golang/internal/consumer"
+	worker "project-golang/internal/server/consumer"
 
 	"go.uber.org/fx"
 )

@@ -1,36 +1,9 @@
 # github.com/americanas-go/config v1.8.6
 ## explicit; go 1.22
 github.com/americanas-go/config
-# github.com/americanas-go/ignite v1.15.5
-## explicit; go 1.22
-github.com/americanas-go/ignite/go.uber.org/fx.v1
 # github.com/americanas-go/log v1.8.10
 ## explicit; go 1.22
 github.com/americanas-go/log
-# github.com/aws/aws-sdk-go v1.51.17
-## explicit; go 1.19
-github.com/aws/aws-sdk-go/aws
-github.com/aws/aws-sdk-go/aws/awserr
-github.com/aws/aws-sdk-go/aws/awsutil
-github.com/aws/aws-sdk-go/aws/client
-github.com/aws/aws-sdk-go/aws/client/metadata
-github.com/aws/aws-sdk-go/aws/credentials
-github.com/aws/aws-sdk-go/aws/endpoints
-github.com/aws/aws-sdk-go/aws/request
-github.com/aws/aws-sdk-go/aws/signer/v4
-github.com/aws/aws-sdk-go/internal/context
-github.com/aws/aws-sdk-go/internal/ini
-github.com/aws/aws-sdk-go/internal/sdkio
-github.com/aws/aws-sdk-go/internal/sdkmath
-github.com/aws/aws-sdk-go/internal/sdkrand
-github.com/aws/aws-sdk-go/internal/shareddefaults
-github.com/aws/aws-sdk-go/internal/strings
-github.com/aws/aws-sdk-go/internal/sync/singleflight
-github.com/aws/aws-sdk-go/private/protocol
-github.com/aws/aws-sdk-go/private/protocol/json/jsonutil
-github.com/aws/aws-sdk-go/private/protocol/jsonrpc
-github.com/aws/aws-sdk-go/private/protocol/rest
-github.com/aws/aws-sdk-go/service/sqs
 # github.com/aws/aws-sdk-go-v2 v1.32.7
 ## explicit; go 1.21
 github.com/aws/aws-sdk-go-v2/aws
@@ -132,15 +105,19 @@ github.com/aws/smithy-go/time
 github.com/aws/smithy-go/tracing
 github.com/aws/smithy-go/transport/http
 github.com/aws/smithy-go/transport/http/internal/io
+# github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc
+## explicit
 # github.com/fsnotify/fsnotify v1.7.0
 ## explicit; go 1.17
 github.com/fsnotify/fsnotify
 # github.com/gobeam/stringy v0.0.6
 ## explicit; go 1.14
 github.com/gobeam/stringy
-# github.com/jmespath/go-jmespath v0.4.0
-## explicit; go 1.14
-github.com/jmespath/go-jmespath
+# github.com/hashicorp/hcl v1.0.1-vault-5
+## explicit; go 1.15
+# github.com/joho/godotenv v1.3.0
+## explicit
+github.com/joho/godotenv
 # github.com/knadh/koanf v1.5.0
 ## explicit; go 1.12
 github.com/knadh/koanf
@@ -152,6 +129,8 @@ github.com/knadh/koanf/providers/confmap
 github.com/knadh/koanf/providers/env
 github.com/knadh/koanf/providers/file
 github.com/knadh/koanf/providers/posflag
+# github.com/kr/pretty v0.3.1
+## explicit; go 1.12
 # github.com/mitchellh/copystructure v1.2.0
 ## explicit; go 1.15
 github.com/mitchellh/copystructure
@@ -164,9 +143,16 @@ github.com/mitchellh/reflectwalk
 # github.com/pelletier/go-toml v1.9.5
 ## explicit; go 1.12
 github.com/pelletier/go-toml
+# github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2
+## explicit
+# github.com/sirupsen/logrus v1.9.3
+## explicit; go 1.13
+github.com/sirupsen/logrus
 # github.com/spf13/pflag v1.0.5
 ## explicit; go 1.12
 github.com/spf13/pflag
+# github.com/stretchr/testify v1.9.0
+## explicit; go 1.17
 # go.uber.org/dig v1.18.0
 ## explicit; go 1.20
 go.uber.org/dig

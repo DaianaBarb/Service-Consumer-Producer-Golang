@@ -10,8 +10,9 @@
         "mode": "debug",
         "program": "${workspaceRoot}/cmd/api-server",
         "env": {
-            "CONF": "../../configs/default.yaml,../../configs/rest.yaml,../../configs/worker/development.yaml",
-            "A_C":"B"
+            //  "CONF": "../../configs/default.yaml,../../configs/rest.yaml,../../configs/worker/development.yaml",
+           //  "APP_ENV": "prod"
+          //  "A_C":"B"
         },
         "args": [],
         "showLog": false

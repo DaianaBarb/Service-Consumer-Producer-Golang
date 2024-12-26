@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  # Serviço para rodar a aplicação Go
+  api-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: api-server
+    ports:
+      - "8080:8080"
+    environment:
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - AWS_REGION=us-east-1
+      - LOCALSTACK_HOST=localstack
+      - CONFIG_PATH=/app/config/config.yaml
+    depends_on:
+      - localstack
+    networks:
+      - localstack_network
+
+  # Serviço para rodar o LocalStack
+  localstack:
+    image: localstack/localstack:3.7
+    container_name: localstack
+    ports:
+      - "4566:4566"  # Porta principal de acesso ao LocalStack
+      - "4510-4559:4510-4559"  # Porta para as APIs individuais
+    environment:
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - SERVICES=s3,dynamodb,sqs # Especifica quais serviços do AWS LocalStack você deseja usar
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"  # Permitir que o LocalStack use o Docker
+    networks:
+      - localstack_network
+
+networks:
+  localstack_network:
+    driver: bridge

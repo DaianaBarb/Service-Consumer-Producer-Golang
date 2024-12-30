@@ -5,12 +5,15 @@ go 1.23.4
 require (
 	github.com/americanas-go/config v1.8.6
 	github.com/americanas-go/log v1.8.10
+	github.com/aws/aws-sdk-go v1.55.5
 	github.com/aws/aws-sdk-go-v2 v1.32.7
 	github.com/aws/aws-sdk-go-v2/config v1.28.7
 	github.com/aws/aws-sdk-go-v2/credentials v1.17.48
 	github.com/aws/aws-sdk-go-v2/service/sqs v1.37.3
+	github.com/golang-jwt/jwt/v4 v4.5.1
 	github.com/joho/godotenv v1.3.0
 	github.com/sirupsen/logrus v1.9.3
+	github.com/sony/gobreaker v1.0.0
 	go.uber.org/fx v1.23.0
 	golang.org/x/text v0.21.0
 )

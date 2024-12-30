@@ -10,6 +10,7 @@ import (
 type Client interface {
 	ReceiveMessage(context context.Context, input *sqs.ReceiveMessageInput) (*sqs.ReceiveMessageOutput, error)
 	DeleteMessage(context context.Context, message *sqs.DeleteMessageInput) (*sqs.DeleteMessageOutput, error)
+	SendMessage(ctx context.Context, input *sqs.SendMessageInput) (*sqs.SendMessageOutput, error)
 }
 
 type client struct {
@@ -30,4 +31,15 @@ func NewClient(awsConfig aws.Config) Client {
 	awsClient := sqs.NewFromConfig(awsConfig)
 
 	return &client{awsClient}
+}
+
+func (c *client) SendMessage(ctx context.Context, input *sqs.SendMessageInput) (*sqs.SendMessageOutput, error) {
+
+	output, err := c.awsClient.SendMessage(ctx, input, nil)
+
+	if err != nil {
+		return output, err
+	}
+	return output, nil
+
 }

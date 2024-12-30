@@ -5,7 +5,10 @@ import (
 	"errors"
 	"fmt"
 	"project-golang/internal/domain/entity"
+	"sync"
 )
+
+var tenantConfigCache = sync.Map{}
 
 type IRepository interface {
 	CreatedSimulation(simu *entity.Simulation) error
@@ -131,6 +134,10 @@ func (r *Repository) FindByIdSimulation(simulationId string) (*entity.Simulation
 }
 func (r *Repository) FindByIdSetup(setupId string) (*entity.Setup, error) {
 
+	if config, ok := tenantConfigCache.Load(setupId); ok {
+		return config.(*entity.Setup), nil
+	}
+
 	setup := &entity.Setup{}
 
 	query := `
@@ -152,6 +159,8 @@ func (r *Repository) FindByIdSetup(setupId string) (*entity.Setup, error) {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, fmt.Errorf("setup com ID %s não encontrada", setupId)
 		}
+
+		tenantConfigCache.Store(setupId, setup)
 		return nil, err
 	}
 
@@ -187,3 +196,6 @@ func (r *Repository) FindByIdBorrower(borrwerId string) (*entity.Borrower, error
 	return borrwer, nil
 
 }
+
+// resolver problema do id do setup criar a tabela ja com o id com o nome do tenant
+// FECHAR A CONEXÃO DO BANCO

@@ -1,0 +1,31 @@
+basePath: /v1/simulation
+host: localhost:8080
+info:
+  contact:
+    email: daiana.soares@hotmail.com
+    name: Suporte
+  description: Esta é uma API de simulação de emprestimos documentada com Swagger
+    em Go.
+  license:
+    name: MIT
+    url: http://opensource.org/licenses/MIT
+  termsOfService: http://swagger.io/terms/
+  title: DOC com o  Swagger
+  version: "1.0"
+paths:
+  /v1/simulation:
+    post:
+      consumes:
+      - application/json
+      description: cria uma simulation de emprestimo
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            type: simulation
+      summary: cria uma simulation
+      tags:
+      - simulation
+swagger: "2.0"

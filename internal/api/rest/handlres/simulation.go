@@ -41,7 +41,14 @@ func (s *SimulationHandler) CreatedSetup(w http.ResponseWriter, r *http.Request)
 	panic("unimplemented")
 }
 
-// CreatedSimulation implements ISimulationHandler.
+
+// @Summary cria uma simulation
+// @Description cria uma simulation de emprestimo
+// @Tags simulation
+// @Accept  json
+// @Produce  json
+// @Success 201 {simulation} Simulation
+// @Router /v1/simulation [POST]
 func (s *SimulationHandler) CreatedSimulation(w http.ResponseWriter, r *http.Request) {
 	panic("unimplemented")
 }

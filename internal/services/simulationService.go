@@ -24,7 +24,7 @@ import (
 var SecretKey = []byte("chave_secreta_")
 
 type ISimulationService interface {
-	CreatedSimulation(simu *model.Simulation) error
+	CreatedSimulation(ctx context.Context, simu *model.Simulation, tokenString string) error
 	CreatedBorrower(tom *model.Borrower) error
 	CreatedSetup(set *model.Setup) error
 	FindByIdSimulation(simulationId string) (*model.Simulation, error)
@@ -32,6 +32,7 @@ type ISimulationService interface {
 	FindByIdBorrower(borrwerId string) (*model.Borrower, error)
 	UpdateSetup(setupId string, newSetup *model.Setup) error
 	UpdateSimulationStatus(simulationId string, status string) error
+	SimulationResponseBorrower(response *model.SimulationResponseBorrower) error
 }
 
 type SimulationService struct {
@@ -44,9 +45,25 @@ func NewSimulationService(repo repository.IRepository, sqs sqsAws.Client) ISimul
 		sqsClient: sqs}
 }
 
+// SimulationResponseBorrower implements ISimulationService.
+func (s *SimulationService) SimulationResponseBorrower(response *model.SimulationResponseBorrower) error {
+	// persistir no banco o status e enviar pra fila
+
+	err := s.repository.UpdateSimulationStatus(response.SimulationId, response.Status)
+	if err != nil {
+		return err
+	}
+	err = s.sendMessageQueueNotification(context.Background(), &dto.QueuePublishPayload{SimulationId: response.SimulationId})
+
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // CreatedBorrower implements ISimulationService.
 func (s *SimulationService) CreatedBorrower(tom *model.Borrower) error {
-	panic("unimplemented")
+	return s.repository.CreatedBorrower(model.ToBorrowerEntity(tom))
 }
 
 // CreatedSetup implements ISimulationService.
@@ -55,10 +72,54 @@ func (s *SimulationService) CreatedSetup(set *model.Setup) error {
 }
 
 // CreatedSimulation implements ISimulationService.
-func (s *SimulationService) CreatedSimulation(simu *model.Simulation) error {
+func (s *SimulationService) CreatedSimulation(ctx context.Context, simu *model.Simulation, tokenString string) error {
 
-	//codar condiçoes de simulação aqui
-	return s.repository.CreatedSimulation(model.ToSimulationEntity(simu))
+	//verificar fraude
+	// validar token e escopo
+	// buscar setup
+	// calcular juros
+	// salvar simulação no banco
+	//enviar pra fila de notificações
+	//enviar pra fila pro tomador aceitar a siulação
+	_, err := s.checkAntiFraude(&dto.AntiFraudRequest{BorrowerId: simu.BorrowerId,
+		LoanValue: simu.LoanValue})
+
+	if err != nil {
+		return err
+	}
+
+	_, err = s.validatingTokenJwtAndCheckingValidScope(tokenString, os.Getenv("EXPECTED_ESCOPE"))
+
+	if err != nil {
+		return err
+	}
+	setup, err := s.repository.FindByIdSetup(os.Getenv("SETUP_ID"))
+	if err != nil {
+		return err
+	}
+
+	juros, err := s.calculateInterest(model.ToSetupModel(setup), simu.NumberOfInstallments)
+	simu.InterestRate = juros
+	simu.Status = "CREATED"
+
+	newSimu, err := s.repository.CreatedSimulation(model.ToSimulationEntity(simu))
+	if err != nil {
+		return err
+	}
+	err = s.sendMessageQueueNotification(ctx, &dto.QueuePublishPayload{
+		SimulationId: newSimu.SimulationId,
+	})
+	if err != nil {
+		return err
+	}
+	err = s.sendMessageQueueBorrowerAceptOrRejectedSimulation(ctx, &dto.QueuePublishPayload{
+		SimulationId: newSimu.SimulationId,
+	})
+	if err != nil {
+		return err
+	}
+	return nil
+	// aplicar o try do pacote resiliense do GO pra caso der erro ao fazer um send na fila
 }
 
 // FindByIdBorrower implements ISimulationService.
@@ -174,7 +235,7 @@ func (s *SimulationService) calculateInterest(setup *model.Setup, numberOfInstal
 	return juros, nil
 }
 
-func (s *SimulationService) sendMessageQueueNotification(ctx context.Context, payload dto.QueuePublishPayload) error {
+func (s *SimulationService) sendMessageQueueNotification(ctx context.Context, payload *dto.QueuePublishPayload) error {
 
 	format, err := json.Marshal(payload)
 	if err != nil {
@@ -193,7 +254,7 @@ func (s *SimulationService) sendMessageQueueNotification(ctx context.Context, pa
 
 }
 
-func (s *SimulationService) sendMessageQueueBorrowerAceptOrRejectedSimulation(ctx context.Context, payload dto.QueuePublishPayload) error {
+func (s *SimulationService) sendMessageQueueBorrowerAceptOrRejectedSimulation(ctx context.Context, payload *dto.QueuePublishPayload) error {
 	format, err := json.Marshal(payload)
 	if err != nil {
 		return err

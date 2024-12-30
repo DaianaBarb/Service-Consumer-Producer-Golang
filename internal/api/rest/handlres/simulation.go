@@ -15,10 +15,16 @@ type ISimulationHandler interface {
 	UpdateSetup(w http.ResponseWriter, r *http.Request)
 	UpdateSimulationStatus(w http.ResponseWriter, r *http.Request)
 	SimulationResponseBorrower(w http.ResponseWriter, r *http.Request)
+	GenerateJWTw(w http.ResponseWriter, r *http.Request)
 }
 
 type SimulationHandler struct {
 	service *service.ISimulationService
+}
+
+// GenerateJWTw implements ISimulationHandler.
+func (s *SimulationHandler) GenerateJWTw(w http.ResponseWriter, r *http.Request) {
+	panic("unimplemented")
 }
 
 func NewSimulationHandler(serv *service.ISimulationService) ISimulationHandler {

@@ -12,12 +12,18 @@ type Model struct {
 type Simulation struct {
 	SimulationId         string
 	BorrowerId           string
-	LoanValue            string  // valor emprestimo
+	LoanValue            float64 // valor emprestimo
 	NumberOfInstallments float64 // quantidade de parcelas
 	CreatedAt            *time.Time
 	UpdatedAt            *time.Time
 	Status               string
 	InterestRate         float64
+}
+
+type LogEntry struct {
+	Level     string `json:"level"`
+	Message   string `json:"message"`
+	Timestamp string `json:"timestamp"`
 }
 
 type Borrower struct {
@@ -47,6 +53,11 @@ type Contract struct {
 	CreatedAt    *time.Time
 	Status       string
 	terms        string
+}
+
+type SimulationResponseBorrower struct {
+	SimulationId string
+	Status       string
 }
 
 type PayloadJWT struct {

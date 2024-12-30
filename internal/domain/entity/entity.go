@@ -7,7 +7,7 @@ import (
 type Simulation struct {
 	SimulationId         string
 	BorrowerId           string
-	LoanValue            string  // valor emprestimo
+	LoanValue            float64  // valor emprestimo
 	NumberOfInstallments float64 // quantidade de parcelas
 	CreatedAt            *time.Time
 	UpdatedAt            *time.Time

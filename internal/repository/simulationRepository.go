@@ -4,14 +4,16 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"os"
 	"project-golang/internal/domain/entity"
+	"project-golang/internal/logger"
 	"sync"
 )
 
 var tenantConfigCache = sync.Map{}
 
 type IRepository interface {
-	CreatedSimulation(simu *entity.Simulation) error
+	CreatedSimulation(simu *entity.Simulation) (*entity.Simulation, error)
 	CreatedBorrower(tom *entity.Borrower) error
 	CreatedSetup(set *entity.Setup) error
 	FindByIdSimulation(simulationId string) (*entity.Simulation, error)
@@ -22,28 +24,54 @@ type IRepository interface {
 }
 
 type Repository struct {
-	db *sql.DB
+	db     *sql.DB
+	logger logger.ILogCloudWatch
 }
 
-func NewRepository(db *sql.DB) IRepository {
+func NewRepository(db *sql.DB, log logger.ILogCloudWatch) IRepository {
 
 	return &Repository{
-		db: db,
+		db:     db,
+		logger: log,
 	}
 }
 
-func (r *Repository) CreatedSimulation(simu *entity.Simulation) error {
+func (r *Repository) CreatedSimulation(simu *entity.Simulation) (*entity.Simulation, error) {
+	simula := &entity.Simulation{}
 
 	query := `
 		INSERT INTO simulations (borrower_id, loan_value, number_installments, interest_rate, status,created_at, updated_at)
 		VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
 	`
 
-	_, err := r.db.Exec(query, simu.BorrowerId, simu.LoanValue, simu.NumberOfInstallments, simu.InterestRate, simu.Status)
+	// _, err := r.db.Exec(query, simu.BorrowerId, simu.LoanValue, simu.NumberOfInstallments, simu.InterestRate, simu.Status)
+	// if err != nil {
+	// 	return err
+	// }
+
+	err := r.db.QueryRow(
+		query,
+		simu.BorrowerId,
+		simu.LoanValue,
+		simu.NumberOfInstallments,
+		simu.InterestRate,
+		simu.Status,
+	).Scan(
+		simula.SimulationId,
+		simula.BorrowerId,
+		simula.LoanValue,
+		simula.NumberOfInstallments,
+		simula.InterestRate,
+		simula.Status,
+		simula.CreatedAt,
+		simula.UpdatedAt,
+	)
+
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+
+	return simu, nil
 
 }
 
@@ -62,11 +90,11 @@ func (r *Repository) CreatedBorrower(tom *entity.Borrower) error {
 func (r *Repository) CreatedSetup(set *entity.Setup) error {
 
 	query := `
-	INSERT INTO setup ( capital, fees, interest_rate,created_at, updated_at)
-	VALUES ($1, $2, $3, NOW(), NOW())
+	INSERT INTO setup ( setup_id, capital, fees, interest_rate,created_at, updated_at)
+	VALUES ($1, $2, $3,$4, NOW(), NOW())
 `
 
-	_, err := r.db.Exec(query, set.Capital, set.Fees, set.InterestRate)
+	_, err := r.db.Exec(query, os.Getenv("SETUP_ID"), set.Capital, set.Fees, set.InterestRate)
 	if err != nil {
 		return err
 	}
@@ -128,7 +156,6 @@ func (r *Repository) FindByIdSimulation(simulationId string) (*entity.Simulation
 		}
 		return nil, err
 	}
-
 	return simulation, nil
 
 }
@@ -196,6 +223,3 @@ func (r *Repository) FindByIdBorrower(borrwerId string) (*entity.Borrower, error
 	return borrwer, nil
 
 }
-
-// resolver problema do id do setup criar a tabela ja com o id com o nome do tenant
-// FECHAR A CONEXÃO DO BANCO

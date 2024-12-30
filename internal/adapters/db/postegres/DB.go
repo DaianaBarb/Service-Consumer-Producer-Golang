@@ -6,11 +6,14 @@ import (
 	"os"
 )
 
-func Connect() *sql.DB{
-	db, err := sql.Open("postegres", os.Getenv("DB_TENANT_1"))
+func Connect() *sql.DB {
 
-  if err!= nil{
-	log.Fatalf("connect DB error")
-  }
-  return db
+	db, err := sql.Open("postegres", os.Getenv("DB_TENANT_1"))
+	defer db.Close()
+	if err != nil {
+		log.Fatalf("connect DB error")
+	}
+
+	return db
+
 }

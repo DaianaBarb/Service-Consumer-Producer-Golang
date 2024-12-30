@@ -14,6 +14,7 @@ type ISimulationHandler interface {
 	FindByIdBorrower(w http.ResponseWriter, r *http.Request)
 	UpdateSetup(w http.ResponseWriter, r *http.Request)
 	UpdateSimulationStatus(w http.ResponseWriter, r *http.Request)
+	SimulationResponseBorrower(w http.ResponseWriter, r *http.Request)
 }
 
 type SimulationHandler struct {
@@ -61,5 +62,9 @@ func (s *SimulationHandler) UpdateSetup(w http.ResponseWriter, r *http.Request) 
 
 // UpdateSimulationStatus implements ISimulationHandler.
 func (s *SimulationHandler) UpdateSimulationStatus(w http.ResponseWriter, r *http.Request) {
+	panic("unimplemented")
+}
+
+func (s *SimulationHandler) SimulationResponseBorrower(w http.ResponseWriter, r *http.Request) {
 	panic("unimplemented")
 }

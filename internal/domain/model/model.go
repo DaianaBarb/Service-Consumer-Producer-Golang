@@ -1,6 +1,9 @@
 package model
 
-import "time"
+import (
+	"project-golang/internal/domain/entity"
+	"time"
+)
 
 type Model struct {
 	Message string `json:"message"`
@@ -9,10 +12,10 @@ type Model struct {
 type Simulation struct {
 	SimulationId         string
 	BorrowerId           string
-	LoanValue            string // valor emprestimo
-	NumberOfInstallments float64    // quantidade de parcelas
+	LoanValue            string  // valor emprestimo
+	NumberOfInstallments float64 // quantidade de parcelas
 	CreatedAt            *time.Time
-	UpdateAt             *time.Time
+	UpdatedAt            *time.Time
 	Status               string
 	InterestRate         float64
 }
@@ -28,10 +31,14 @@ type Borrower struct {
 }
 
 type Setup struct {
-	SetupId      string
-	Capital      float64
-	fees         float64 //juros
-	InterestRate float64 // taxa de juros
+	SetupId       string
+	Capital       float64
+	Fees          float64 //juros
+	InterestRate  float64 // taxa de juros
+	Escope        string
+	EscopeIdValid bool
+	CreatedAt     *time.Time
+	UpdatedAt     *time.Time
 }
 
 type Contract struct {
@@ -46,4 +53,83 @@ type PayloadJWT struct {
 	CredorID  string
 	Escopo    string
 	Expiracao int64
+}
+
+func ToSetupEntity(setup *Setup) *entity.Setup {
+	return &entity.Setup{
+		SetupId:      setup.SetupId,
+		Capital:      setup.Capital,
+		Fees:         setup.Fees,
+		InterestRate: setup.InterestRate,
+		CreatedAt:    setup.CreatedAt,
+		UpdatedAt:    setup.UpdatedAt,
+	}
+
+}
+
+func ToSimulationEntity(simu *Simulation) *entity.Simulation {
+
+	return &entity.Simulation{
+		SimulationId:         simu.SimulationId,
+		BorrowerId:           simu.BorrowerId,
+		LoanValue:            simu.LoanValue,
+		NumberOfInstallments: simu.NumberOfInstallments,
+		CreatedAt:            simu.CreatedAt,
+		UpdatedAt:            simu.UpdatedAt,
+		Status:               simu.Status,
+		InterestRate:         simu.InterestRate,
+	}
+
+}
+
+func ToSimulationModel(simu *entity.Simulation) *Simulation {
+
+	return &Simulation{
+		SimulationId:         simu.SimulationId,
+		BorrowerId:           simu.BorrowerId,
+		LoanValue:            simu.LoanValue,
+		NumberOfInstallments: simu.NumberOfInstallments,
+		CreatedAt:            simu.CreatedAt,
+		UpdatedAt:            simu.UpdatedAt,
+		Status:               simu.Status,
+		InterestRate:         simu.InterestRate,
+	}
+
+}
+
+func ToSetupModel(setup *entity.Setup) *Setup {
+	return &Setup{
+		SetupId:      setup.SetupId,
+		Capital:      setup.Capital,
+		Fees:         setup.Fees,
+		InterestRate: setup.InterestRate,
+		CreatedAt:    setup.CreatedAt,
+		UpdatedAt:    setup.UpdatedAt,
+	}
+
+}
+
+func ToBorrowerdModel(bo *entity.Borrower) *Borrower {
+	return &Borrower{
+		BorrowerId: bo.BorrowerId,
+		Name:       bo.BorrowerId,
+		Phone:      bo.Phone,
+		Email:      bo.Email,
+		Cpf:        bo.Cpf,
+		CreatedAt:  bo.CreatedAt,
+		UpdateAt:   bo.UpdatedAt}
+
+}
+func ToBorrowerEntity(bo *Borrower) *entity.Borrower {
+
+	return &entity.Borrower{
+		BorrowerId: bo.BorrowerId,
+		Name:       bo.BorrowerId,
+		Phone:      bo.Phone,
+		Email:      bo.Email,
+		Cpf:        bo.Cpf,
+		CreatedAt:  bo.CreatedAt,
+		UpdatedAt:  bo.UpdateAt,
+	}
+
 }

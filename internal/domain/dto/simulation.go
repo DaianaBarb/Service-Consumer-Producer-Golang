@@ -12,3 +12,9 @@ type AntiFraudResponse struct {
 type QueuePublishPayload struct {
 	SimulationId string `json:"simulationId "`
 }
+
+type SimulationRequest struct {
+}
+
+type SimulationResponse struct {
+}

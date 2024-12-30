@@ -12,7 +12,7 @@ import (
 	"github.com/sony/gobreaker"
 )
 
-func CheckAntiFraud(request dto.AntiFraudRequest) (*dto.AntiFraudResponse, error) {
+func CheckAntiFraud(request *dto.AntiFraudRequest) (*dto.AntiFraudResponse, error) {
 	//CRIANDO CONFIG BREAKER
 	settings := gobreaker.Settings{
 		Name: "AntifraudeAPI",
@@ -27,27 +27,21 @@ func CheckAntiFraud(request dto.AntiFraudRequest) (*dto.AntiFraudResponse, error
 	reqFunc := func() (interface{}, error) {
 		return antiFraudRequest(request)
 	}
-	for i := 0; i < 1; i++ {
 
-		result, err := cb.Execute(reqFunc)
-		if err != nil {
-			return nil, fmt.Errorf("erro ao consultar a API antifraude: %w", err)
-		}
-		response, ok := result.(dto.AntiFraudResponse)
-		if !ok {
-			if i != 1 {
-				time.Sleep(2 * time.Second)
-				continue
-			}
-			return nil, fmt.Errorf("erro inesperado na resposta da API antifraude")
-		}
-		return &response, nil
-
+	result, err := cb.Execute(reqFunc)
+	if err != nil {
+		return nil, fmt.Errorf("erro ao consultar a API antifraude: %w", err)
 	}
-	return nil, fmt.Errorf("erro inesperado na resposta da API antifraude")
+	response, ok := result.(dto.AntiFraudResponse)
+	if !ok {
+
+		return nil, fmt.Errorf("erro inesperado na resposta da API antifraude")
+	}
+	return &response, nil
+
 }
 
-func antiFraudRequest(request dto.AntiFraudRequest) (*dto.AntiFraudResponse, error) {
+func antiFraudRequest(request *dto.AntiFraudRequest) (*dto.AntiFraudResponse, error) {
 	var response = &dto.AntiFraudResponse{}
 	timeout := 5 * time.Second
 	jsonData, err := json.Marshal(request)

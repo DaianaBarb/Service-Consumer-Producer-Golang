@@ -1,14 +1,16 @@
 package entity
 
-import "time"
+import (
+	"time"
+)
 
 type Simulation struct {
 	SimulationId         string
 	BorrowerId           string
-	LoanValue            string // valor emprestimo
-	NumberOfInstallments int    // quantidade de parcelas
+	LoanValue            string  // valor emprestimo
+	NumberOfInstallments float64 // quantidade de parcelas
 	CreatedAt            *time.Time
-	UpdatedAt             *time.Time
+	UpdatedAt            *time.Time
 	Status               string
 	InterestRate         float64
 }
@@ -20,7 +22,7 @@ type Borrower struct {
 	Email      string
 	Cpf        string
 	CreatedAt  *time.Time
-	UpdatedAt   *time.Time
+	UpdatedAt  *time.Time
 }
 
 type Setup struct {
@@ -29,7 +31,7 @@ type Setup struct {
 	Fees         float64 //juros
 	InterestRate float64 // taxa de juros
 	CreatedAt    *time.Time
-	UpdatedAt     *time.Time
+	UpdatedAt    *time.Time
 }
 
 type Contract struct {

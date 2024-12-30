@@ -11,6 +11,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/credentials v1.17.48
 	github.com/aws/aws-sdk-go-v2/service/sqs v1.37.3
 	github.com/golang-jwt/jwt/v4 v4.5.1
+	github.com/gorilla/mux v1.8.1
 	github.com/joho/godotenv v1.3.0
 	github.com/sirupsen/logrus v1.9.3
 	github.com/sony/gobreaker v1.0.0

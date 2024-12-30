@@ -7,7 +7,9 @@ import (
 	"fmt"
 	"os"
 	sqsAws "project-golang/internal/adapters/cloud/aws/sqs"
+	apiantifraude "project-golang/internal/adapters/integrations/apiAntiFraude"
 	"project-golang/internal/domain/dto"
+	"project-golang/internal/domain/entity"
 	"project-golang/internal/domain/model"
 	"project-golang/internal/repository"
 	"time"
@@ -33,11 +35,11 @@ type ISimulationService interface {
 }
 
 type SimulationService struct {
-	repository *repository.IRepository
+	repository repository.IRepository
 	sqsClient  sqsAws.Client
 }
 
-func NewSimulationService(repo *repository.IRepository, sqs sqsAws.Client) ISimulationService {
+func NewSimulationService(repo repository.IRepository, sqs sqsAws.Client) ISimulationService {
 	return &SimulationService{repository: repo,
 		sqsClient: sqs}
 }
@@ -49,44 +51,77 @@ func (s *SimulationService) CreatedBorrower(tom *model.Borrower) error {
 
 // CreatedSetup implements ISimulationService.
 func (s *SimulationService) CreatedSetup(set *model.Setup) error {
-	panic("unimplemented")
+	return s.repository.CreatedSetup(model.ToSetupEntity(set))
 }
 
 // CreatedSimulation implements ISimulationService.
 func (s *SimulationService) CreatedSimulation(simu *model.Simulation) error {
-	panic("unimplemented")
+
+	//codar condiçoes de simulação aqui
+	return s.repository.CreatedSimulation(model.ToSimulationEntity(simu))
 }
 
 // FindByIdBorrower implements ISimulationService.
 func (s *SimulationService) FindByIdBorrower(borrwerId string) (*model.Borrower, error) {
-	panic("unimplemented")
+	bo, err := s.repository.FindByIdBorrower(borrwerId)
+	if err != nil {
+		return nil, err
+	}
+	if (bo != &entity.Borrower{}) {
+
+		return model.ToBorrowerdModel(bo), nil
+	}
+	return nil, errors.New("setup nao encontrado")
 }
 
 // FindByIdSetup implements ISimulationService.
 func (s *SimulationService) FindByIdSetup(setupId string) (*model.Setup, error) {
-	panic("unimplemented")
+	set, err := s.repository.FindByIdSetup(setupId)
+
+	if err != nil {
+
+	}
+	if (set != &entity.Setup{}) {
+		return model.ToSetupModel(set), nil
+	}
+	return nil, errors.New("simulation nao encontrada")
 }
 
 // FindByIdSimulation implements ISimulationService.
 func (s *SimulationService) FindByIdSimulation(simulationId string) (*model.Simulation, error) {
-	panic("unimplemented")
+	simula, err := s.repository.FindByIdSimulation(simulationId)
+	if err != nil {
+		return nil, err
+	}
+	if (simula != &entity.Simulation{}) {
+
+		return model.ToSimulationModel(simula), nil
+	}
+	return nil, errors.New("simulation nao encontrada")
+
 }
 
 // UpdateSetup implements ISimulationService.
 func (s *SimulationService) UpdateSetup(setupId string, newSetup *model.Setup) error {
-	panic("unimplemented")
+
+	return s.repository.UpdateSetup(setupId, model.ToSetupEntity(newSetup))
 }
 
 // UpdateSimulationStatus implements ISimulationService.
 func (s *SimulationService) UpdateSimulationStatus(simulationId string, status string) error {
-	panic("unimplemented")
+	return s.repository.UpdateSimulationStatus(simulationId, status)
 }
 
-func (s *SimulationService) checkAntiFraude() bool {
-	return false
+func (s *SimulationService) checkAntiFraude(request *dto.AntiFraudRequest) (*dto.AntiFraudResponse, error) {
+
+	response, err := apiantifraude.CheckAntiFraud(request)
+	if err != nil {
+		return nil, err
+	}
+	return response, nil
 }
 
-func (s *SimulationService) tokenJWTValido(tokenString string, expectedScope string) (*model.PayloadJWT, error) {
+func (s *SimulationService) validatingTokenJwtAndCheckingValidScope(tokenString string, expectedScope string) (*model.PayloadJWT, error) {
 
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		// alg e o algoritimo de assinatura
@@ -139,10 +174,6 @@ func (s *SimulationService) calculateInterest(setup *model.Setup, numberOfInstal
 	return juros, nil
 }
 
-func (s *SimulationService) credorPossuiServicoSimulaçãoContratado() bool {
-	return false
-
-}
 func (s *SimulationService) sendMessageQueueNotification(ctx context.Context, payload dto.QueuePublishPayload) error {
 
 	format, err := json.Marshal(payload)
@@ -179,12 +210,12 @@ func (s *SimulationService) sendMessageQueueBorrowerAceptOrRejectedSimulation(ct
 	return nil
 }
 
-func (s *SimulationService) GenerateJWT(credorID, escopo string) (string, error) {
+func (s *SimulationService) GenerateJWT(payload model.PayloadJWT) (string, error) {
 	expiracao := time.Now().Add(48 * time.Hour) //expira com 2 dias apartir da hora atual
 	// Claims do token
 	claims := jwt.MapClaims{
-		"credorId":  credorID,
-		"Escopo":    escopo,
+		"credorId":  payload.CredorID,
+		"Escopo":    payload.Escopo,
 		"Expiração": expiracao.Unix(),
 	}
 

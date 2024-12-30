@@ -16,6 +16,8 @@ func (s *service) Process(updated *model.Model) error {
 
 }
 
-func NewService() Processor {
+func NewService() Processor  {
 	return &service{}
 }
+
+

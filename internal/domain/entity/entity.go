@@ -1,10 +1,6 @@
-package model
+package entity
 
 import "time"
-
-type Model struct {
-	Message string `json:"message"`
-}
 
 type Simulation struct {
 	SimulationId         string
@@ -12,7 +8,7 @@ type Simulation struct {
 	LoanValue            string // valor emprestimo
 	NumberOfInstallments int    // quantidade de parcelas
 	CreatedAt            *time.Time
-	UpdateAt             *time.Time
+	UpdatedAt             *time.Time
 	Status               string
 	InterestRate         float64
 }
@@ -24,14 +20,16 @@ type Borrower struct {
 	Email      string
 	Cpf        string
 	CreatedAt  *time.Time
-	UpdateAt   *time.Time
+	UpdatedAt   *time.Time
 }
 
 type Setup struct {
 	SetupId      string
 	Capital      float64
-	fees         float64 //juros
+	Fees         float64 //juros
 	InterestRate float64 // taxa de juros
+	CreatedAt    *time.Time
+	UpdatedAt     *time.Time
 }
 
 type Contract struct {

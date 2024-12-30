@@ -24,7 +24,7 @@ func Start() {
 	fx.New(
 		module,
 		fx.Invoke(
-			func(job worker.Job) {
+			func(job worker.Consumer) {
 				job.Do()
 			},
 		),

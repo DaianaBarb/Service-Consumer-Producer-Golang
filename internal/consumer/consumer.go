@@ -20,7 +20,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sqs/types"
 )
 
-type Job interface {
+type Consumer interface {
 	Do()
 }
 
@@ -31,15 +31,15 @@ const (
 	sleepTimeout = ".sleepTimeout"
 )
 
-type sqs struct {
+type worker struct {
 	queueUrl          string
 	visibilityTimeout int32
 	sleepTimeout      time.Duration
-	processor         service.Processor
+	service         service.Processor
 	client            sqsAws.Client
 }
 
-func (w *sqs) Do() {
+func (w *worker) Do() {
 	logger := log.FromContext(context.TODO())
 	go HandlerSigtermSignal()
 
@@ -81,7 +81,7 @@ func HandlerSigtermSignal() {
 
 }
 
-func (w *sqs) processMessage(message types.Message, ctx context.Context) {
+func (w *worker) processMessage(message types.Message, ctx context.Context) {
 
 	logger := log.FromContext(ctx)
 	var model = &model.Model{}
@@ -105,13 +105,13 @@ func (w *sqs) processMessage(message types.Message, ctx context.Context) {
 
 }
 
-func NewSqs(sqsClient sqsAws.Client, processor service.Processor) Job {
-	return &sqs{
+func NewSqs(sqsClient sqsAws.Client, service service.Processor) Consumer {
+	return &worker{
 		queueUrl:          os.Getenv("QUEUE_URL"),
-		visibilityTimeout: int32(config.Int("30")),
-		sleepTimeout:      config.Duration("10000") * time.Millisecond,
+		visibilityTimeout: int32(config.Int(os.Getenv("TIMEOUTPATH"))),
+		sleepTimeout:      config.Duration(os.Getenv("SLEEPTIMEOUT")) * time.Millisecond,
 		client:            sqsClient,
-		processor:         processor,
+		service:         service,
 	}
 
 }

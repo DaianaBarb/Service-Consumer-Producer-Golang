@@ -24,7 +24,7 @@ import (
 var SecretKey = []byte("chave_secreta_")
 
 type ISimulationService interface {
-	CreatedSimulation(ctx context.Context, simu *model.Simulation, tokenString string) error
+	CreatedSimulation(ctx context.Context, simu *model.Simulation, token *jwt.Token) error
 	CreatedBorrower(tom *model.Borrower) error
 	CreatedSetup(set *model.Setup) error
 	FindByIdSimulation(simulationId string) (*model.Simulation, error)
@@ -34,6 +34,8 @@ type ISimulationService interface {
 	UpdateSimulationStatus(simulationId string, status string) error
 	SimulationResponseBorrower(response *model.SimulationResponseBorrower) error
 	GenerateJWT(payload model.PayloadJWT) (string, error)
+	TokenIsValid(tokenString string) (*jwt.Token, error)
+
 	Ping() error
 }
 
@@ -74,10 +76,11 @@ func (s *SimulationService) CreatedSetup(set *model.Setup) error {
 }
 
 // CreatedSimulation implements ISimulationService.
-func (s *SimulationService) CreatedSimulation(ctx context.Context, simu *model.Simulation, tokenString string) error {
+func (s *SimulationService) CreatedSimulation(ctx context.Context, simu *model.Simulation, token *jwt.Token) error {
 
 	//verificar fraude
-	// validar token e escopo
+	// o token ja e validado no handler
+	// validated escopo
 	// buscar setup
 	// calcular juros
 	// salvar simulação no banco
@@ -90,14 +93,17 @@ func (s *SimulationService) CreatedSimulation(ctx context.Context, simu *model.S
 		return err
 	}
 
-	_, err = s.validatingTokenJwtAndCheckingValidScope(tokenString, os.Getenv("EXPECTED_ESCOPE"))
-
-	if err != nil {
-		return err
-	}
 	setup, err := s.repository.FindByIdSetup(os.Getenv("SETUP_ID"))
 	if err != nil {
 		return err
+	}
+	if setup.EscopeIsValid {
+		_, err := s.validateScope(token, setup.Escope)
+		if err != nil {
+			return err
+		}
+	} else {
+		return errors.New("escope in setup invalid")
 	}
 
 	juros, err := s.calculateInterest(model.ToSetupModel(setup), simu.NumberOfInstallments)
@@ -184,7 +190,7 @@ func (s *SimulationService) checkAntiFraude(request *dto.AntiFraudRequest) (*dto
 	return response, nil
 }
 
-func (s *SimulationService) validatingTokenJwtAndCheckingValidScope(tokenString string, expectedScope string) (*model.PayloadJWT, error) {
+func (s *SimulationService) TokenIsValid(tokenString string) (*jwt.Token, error) {
 
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		// alg e o algoritimo de assinatura
@@ -204,6 +210,11 @@ func (s *SimulationService) validatingTokenJwtAndCheckingValidScope(tokenString 
 		return nil, errors.New("token inválido")
 	}
 
+	return token, nil
+
+}
+
+func (s *SimulationService) validateScope(token *jwt.Token, expectedScope string) (*model.PayloadJWT, error) {
 	// Extrair o payload do token
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok {
@@ -226,7 +237,6 @@ func (s *SimulationService) validatingTokenJwtAndCheckingValidScope(tokenString 
 	if payload.Escopo != expectedScope {
 		return nil, fmt.Errorf("escopo inválido: esperado '%s', encontrado '%s'", expectedScope, payload.Escopo)
 	}
-
 	return payload, nil
 
 }

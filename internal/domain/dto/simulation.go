@@ -47,13 +47,77 @@ type SimulationResponseBorrowerRequest struct {
 }
 
 type JwtResponse struct {
-	Token string `json:"token "`
+	Token string `json:"token"`
 }
 
 func ToPayloadJWTModel(r JwtRequest) *model.PayloadJWT {
 	return &model.PayloadJWT{
 		CredorID: r.CredorId,
 		Escopo:   r.CredorId,
+	}
+
+}
+
+type BorrowerRequest struct {
+	Name  string `json:"nome"`
+	Phone string `json:"phone"`
+	Email string `json:"email"`
+	Cpf   string `json:"cpf"`
+}
+
+type BorrowerResponse struct {
+	BorrowerId string     `json:"borrewerId"`
+	Name       string     `json:"name"`
+	Phone      string     `json:"phone"`
+	Email      string     `json:"email"`
+	Cpf        string     `json:"cpf"`
+	CreatedAt  *time.Time `json:"createdAt"`
+	UpdateAt   *time.Time `json:"updateAt"`
+}
+
+type SetupRequest struct {
+	Capital      float64 `json:"capital"`
+	Fees         float64 `json:"fees"`         //juros
+	InterestRate float64 `json:"interestRate"` // taxa de juros
+	Escope       string  `json:"escope"`
+}
+type SetupResponse struct {
+	SetupId       string     `json:"setupId"`
+	Capital       float64    `json:"capital"`
+	Fees          float64    `json:"fees"`         //juros
+	InterestRate  float64    `json:"interestRate"` // taxa de juros
+	Escope        string     `json:"escope"`
+	EscopeIdValid bool       `json:"escopeIdValid"`
+	CreatedAt     *time.Time `json:"createdAt"`
+	UpdateAt      *time.Time `json:"updateAt"`
+}
+
+func ToBorrowerModel(r *BorrowerRequest) *model.Borrower {
+	return &model.Borrower{
+		Name:  r.Name,
+		Phone: r.Phone,
+		Email: r.Email,
+		Cpf:   r.Cpf,
+	}
+
+}
+
+func ToSetupModel(s *SetupRequest) *model.Setup {
+	return &model.Setup{
+		Capital:      s.Capital,
+		Fees:         s.Fees,
+		InterestRate: s.InterestRate,
+		Escope:       s.Escope,
+	}
+
+}
+
+func ToSimulationModel(s *SimulationRequest) *model.Simulation {
+	return &model.Simulation{
+		BorrowerId:           s.BorrowerId,
+		LoanValue:            s.LoanValue,
+		NumberOfInstallments: s.NumberOfInstallments,
+		InterestRate:         s.InterestRate,
 	}
 
 }

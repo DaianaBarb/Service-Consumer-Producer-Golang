@@ -7,7 +7,7 @@ import (
 type Simulation struct {
 	SimulationId         string
 	BorrowerId           string
-	LoanValue            float64  // valor emprestimo
+	LoanValue            float64 // valor emprestimo
 	NumberOfInstallments float64 // quantidade de parcelas
 	CreatedAt            *time.Time
 	UpdatedAt            *time.Time
@@ -26,12 +26,14 @@ type Borrower struct {
 }
 
 type Setup struct {
-	SetupId      string
-	Capital      float64
-	Fees         float64 //juros
-	InterestRate float64 // taxa de juros
-	CreatedAt    *time.Time
-	UpdatedAt    *time.Time
+	SetupId       string
+	Capital       float64
+	Fees          float64 //juros
+	InterestRate  float64 // taxa de juros
+	Escope        string
+	EscopeIsValid bool
+	CreatedAt     *time.Time
+	UpdatedAt     *time.Time
 }
 
 type Contract struct {

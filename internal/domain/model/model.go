@@ -42,7 +42,7 @@ type Setup struct {
 	Fees          float64 //juros
 	InterestRate  float64 // taxa de juros
 	Escope        string
-	EscopeIdValid bool
+	EscopeIsValid bool
 	CreatedAt     *time.Time
 	UpdatedAt     *time.Time
 }

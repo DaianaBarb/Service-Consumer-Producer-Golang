@@ -31,7 +31,18 @@ type SimulationHandler struct {
 	service service.ISimulationService
 }
 
-// GenerateJWTw implements ISimulationHandler.
+func NewSimulationHandler(serv service.ISimulationService) ISimulationHandler {
+	return &SimulationHandler{service: serv}
+}
+
+// @Summary GenerateJWTw
+// @Description gera um token jwt pra solicitação de emprestimo
+// @Tags GenerateJWTw
+// @Accept  json
+// @Produce  json
+// @Success 201 {jwtRequest} JwtRequest
+// @Router /v1/simulation/generateJwt [POST]
+
 func (s *SimulationHandler) GenerateJWTw(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
 	ctx = context.WithValue(ctx, "generatJWT", r.Header.Get("X-User"))
@@ -61,30 +72,142 @@ func (s *SimulationHandler) GenerateJWTw(w http.ResponseWriter, r *http.Request)
 
 	token, err := s.service.GenerateJWT(*dto.ToPayloadJWTModel(*request))
 
-	if error != nil {
+	if err != nil {
 		//logar error
 		utils.ErrorResponse(w, errors.Internalf("request error: %v", err))
 		return
 	}
 
-	utils.SuccessResponse(w, http.StatusCreated,  dto.JwtResponse{
+	utils.SuccessResponse(w, http.StatusCreated, dto.JwtResponse{
 		Token: token,
 	})
 
 }
 
-func NewSimulationHandler(serv service.ISimulationService) ISimulationHandler {
-	return &SimulationHandler{service: serv}
-}
+// @Summary CreatedBorrower
+// @Description cria um Borrower
+// @Tags Borrower
+// @Accept  json
+// @Produce  json
+// @Success 201 {borrower} Borrower
+// @Router /v1/Borrower [POST]
 
-// CreatedBorrower implements ISimulationHandler.
 func (s *SimulationHandler) CreatedBorrower(w http.ResponseWriter, r *http.Request) {
-	panic("unimplemented")
+
+	ctx := context.Background()
+	ctx = context.WithValue(ctx, "generatJWT", r.Header.Get("X-User"))
+	user := r.Header.Get("X-User")
+	w.Header().Set("Content-Type", "application/json")
+
+	if len(user) == 0 || user == "" {
+
+		// fazer log user invalid
+		utils.ErrorResponse(w, errors.BadRequestf("header X-User not exists"))
+		return
+	}
+
+	token, err := extractToken(r)
+	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		utils.ErrorResponse(w, errors.Unauthorizedf("Unauthorized error: %v", err))
+		return
+	}
+	tokenJwt, err := s.service.TokenIsValid(token)
+
+	if err != nil && tokenJwt == nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		utils.ErrorResponse(w, errors.Unauthorizedf("Unauthorized error: %v", err))
+		return
+	}
+
+	request := &dto.BorrowerRequest{}
+
+	err = json.NewDecoder(r.Body).Decode(&request)
+	if err != nil {
+		//logar error
+		utils.ErrorResponse(w, errors.UnprocessableEntityf("unprocessable entity error: %v", err))
+		return
+	}
+	error := utils.ValidateStruct(&request)
+	if error != nil {
+		//logar error
+		utils.ErrorResponse(w, errors.BadRequestf("bad request error: %v", err))
+		return
+	}
+
+	err = s.service.CreatedBorrower(dto.ToBorrowerModel(request))
+
+	if err != nil {
+		//logar error
+		utils.ErrorResponse(w, errors.Internalf("request error: %v", err))
+		return
+	}
+
+	utils.SuccessResponse(w, http.StatusCreated, nil)
+
 }
 
+// @Summary CreatedSetup
+// @Description cria um Setup
+// @Tags Setup
+// @Accept  json
+// @Produce  json
+// @Success 201 {setup} Setup
+// @Router /v1/setup [POST]
 // CreatedSetup implements ISimulationHandler.
 func (s *SimulationHandler) CreatedSetup(w http.ResponseWriter, r *http.Request) {
-	panic("unimplemented")
+
+	ctx := context.Background()
+	ctx = context.WithValue(ctx, "generatJWT", r.Header.Get("X-User"))
+	user := r.Header.Get("X-User")
+	w.Header().Set("Content-Type", "application/json")
+
+	if len(user) == 0 || user == "" {
+
+		// fazer log user invalid
+		utils.ErrorResponse(w, errors.BadRequestf("header X-User not exists"))
+		return
+	}
+
+	token, err := extractToken(r)
+	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		utils.ErrorResponse(w, errors.Unauthorizedf("Unauthorized error: %v", err))
+		return
+	}
+	tokenJwt, err := s.service.TokenIsValid(token)
+
+	if err != nil && tokenJwt == nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		utils.ErrorResponse(w, errors.Unauthorizedf("Unauthorized error: %v", err))
+		return
+	}
+
+	request := &dto.SetupRequest{}
+
+	err = json.NewDecoder(r.Body).Decode(&request)
+	if err != nil {
+		//logar error
+		utils.ErrorResponse(w, errors.UnprocessableEntityf("unprocessable entity error: %v", err))
+		return
+	}
+	error := utils.ValidateStruct(&request)
+	if error != nil {
+		//logar error
+		utils.ErrorResponse(w, errors.BadRequestf("bad request error: %v", err))
+		return
+	}
+
+	err = s.service.CreatedSetup(dto.ToSetupModel(request))
+
+	if err != nil {
+		//logar error
+		utils.ErrorResponse(w, errors.Internalf("request error: %v", err))
+		return
+	}
+
+	utils.SuccessResponse(w, http.StatusCreated, nil)
+
 }
 
 // @Summary cria uma simulation
@@ -95,38 +218,233 @@ func (s *SimulationHandler) CreatedSetup(w http.ResponseWriter, r *http.Request)
 // @Success 201 {simulation} Simulation
 // @Router /v1/simulation [POST]
 func (s *SimulationHandler) CreatedSimulation(w http.ResponseWriter, r *http.Request) {
-	panic("unimplemented")
+	ctx := context.Background()
+	ctx = context.WithValue(ctx, "generatJWT", r.Header.Get("X-User"))
+	user := r.Header.Get("X-User")
+	w.Header().Set("Content-Type", "application/json")
+
+	if len(user) == 0 || user == "" {
+
+		// fazer log user invalid
+		utils.ErrorResponse(w, errors.BadRequestf("header X-User not exists"))
+		return
+	}
+
+	token, err := extractToken(r)
+	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		utils.ErrorResponse(w, errors.Unauthorizedf("Unauthorized error: %v", err))
+		return
+	}
+	tokenJwt, err := s.service.TokenIsValid(token)
+
+	if err != nil && tokenJwt == nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		utils.ErrorResponse(w, errors.Unauthorizedf("Unauthorized error: %v", err))
+		return
+	}
+
+	request := &dto.SimulationRequest{}
+
+	err = json.NewDecoder(r.Body).Decode(&request)
+	if err != nil {
+		//logar error
+		utils.ErrorResponse(w, errors.UnprocessableEntityf("unprocessable entity error: %v", err))
+		return
+	}
+
+	err = s.service.CreatedSimulation(ctx, dto.ToSimulationModel(request), tokenJwt)
+
+	if err != nil {
+		//logar error
+		utils.ErrorResponse(w, errors.Internalf("request error: %v", err))
+		return
+	}
+
+	utils.SuccessResponse(w, http.StatusCreated, nil)
+
 }
 
 // FindByIdBorrower implements ISimulationHandler.
 func (s *SimulationHandler) FindByIdBorrower(w http.ResponseWriter, r *http.Request) {
-	panic("unimplemented")
+	ctx := context.Background()
+	ctx = context.WithValue(ctx, "generatJWT", r.Header.Get("X-User"))
+	user := r.Header.Get("X-User")
+	w.Header().Set("Content-Type", "application/json")
+
+	if len(user) == 0 || user == "" {
+
+		// fazer log user invalid
+		utils.ErrorResponse(w, errors.BadRequestf("header X-User not exists"))
+		return
+	}
+
+	token, err := extractToken(r)
+	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		utils.ErrorResponse(w, errors.Unauthorizedf("Unauthorized error: %v", err))
+		return
+	}
+	tokenJwt, err := s.service.TokenIsValid(token)
+
+	if err != nil && tokenJwt == nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		utils.ErrorResponse(w, errors.Unauthorizedf("Unauthorized error: %v", err))
+		return
+	}
 }
 
 // FindByIdSetup implements ISimulationHandler.
 func (s *SimulationHandler) FindByIdSetup(w http.ResponseWriter, r *http.Request) {
-	panic("unimplemented")
+	ctx := context.Background()
+	ctx = context.WithValue(ctx, "generatJWT", r.Header.Get("X-User"))
+	user := r.Header.Get("X-User")
+	w.Header().Set("Content-Type", "application/json")
+
+	if len(user) == 0 || user == "" {
+
+		// fazer log user invalid
+		utils.ErrorResponse(w, errors.BadRequestf("header X-User not exists"))
+		return
+	}
+
+	token, err := extractToken(r)
+	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		utils.ErrorResponse(w, errors.Unauthorizedf("Unauthorized error: %v", err))
+		return
+	}
+	tokenJwt, err := s.service.TokenIsValid(token)
+
+	if err != nil && tokenJwt == nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		utils.ErrorResponse(w, errors.Unauthorizedf("Unauthorized error: %v", err))
+		return
+	}
 }
 
 // FindByIdSimulation implements ISimulationHandler.
 func (s *SimulationHandler) FindByIdSimulation(w http.ResponseWriter, r *http.Request) {
-	panic("unimplemented")
+	ctx := context.Background()
+	ctx = context.WithValue(ctx, "generatJWT", r.Header.Get("X-User"))
+	user := r.Header.Get("X-User")
+	w.Header().Set("Content-Type", "application/json")
+
+	if len(user) == 0 || user == "" {
+
+		// fazer log user invalid
+		utils.ErrorResponse(w, errors.BadRequestf("header X-User not exists"))
+		return
+	}
+
+	token, err := extractToken(r)
+	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		utils.ErrorResponse(w, errors.Unauthorizedf("Unauthorized error: %v", err))
+		return
+	}
+	tokenJwt, err := s.service.TokenIsValid(token)
+
+	if err != nil && tokenJwt == nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		utils.ErrorResponse(w, errors.Unauthorizedf("Unauthorized error: %v", err))
+		return
+	}
 }
 
 // UpdateSetup implements ISimulationHandler.
 func (s *SimulationHandler) UpdateSetup(w http.ResponseWriter, r *http.Request) {
-	panic("unimplemented")
+	ctx := context.Background()
+	ctx = context.WithValue(ctx, "generatJWT", r.Header.Get("X-User"))
+	user := r.Header.Get("X-User")
+	w.Header().Set("Content-Type", "application/json")
+
+	if len(user) == 0 || user == "" {
+
+		// fazer log user invalid
+		utils.ErrorResponse(w, errors.BadRequestf("header X-User not exists"))
+		return
+	}
+
+	token, err := extractToken(r)
+	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		utils.ErrorResponse(w, errors.Unauthorizedf("Unauthorized error: %v", err))
+		return
+	}
+	tokenJwt, err := s.service.TokenIsValid(token)
+
+	if err != nil && tokenJwt == nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		utils.ErrorResponse(w, errors.Unauthorizedf("Unauthorized error: %v", err))
+		return
+	}
 }
 
 // UpdateSimulationStatus implements ISimulationHandler.
 func (s *SimulationHandler) UpdateSimulationStatus(w http.ResponseWriter, r *http.Request) {
-	panic("unimplemented")
+	ctx := context.Background()
+	ctx = context.WithValue(ctx, "generatJWT", r.Header.Get("X-User"))
+	user := r.Header.Get("X-User")
+	w.Header().Set("Content-Type", "application/json")
+
+	if len(user) == 0 || user == "" {
+
+		// fazer log user invalid
+		utils.ErrorResponse(w, errors.BadRequestf("header X-User not exists"))
+		return
+	}
+
+	token, err := extractToken(r)
+	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		utils.ErrorResponse(w, errors.Unauthorizedf("Unauthorized error: %v", err))
+		return
+	}
+	tokenJwt, err := s.service.TokenIsValid(token)
+
+	if err != nil && tokenJwt == nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		utils.ErrorResponse(w, errors.Unauthorizedf("Unauthorized error: %v", err))
+		return
+	}
 }
 
 func (s *SimulationHandler) SimulationResponseBorrower(w http.ResponseWriter, r *http.Request) {
-	panic("unimplemented")
+	ctx := context.Background()
+	ctx = context.WithValue(ctx, "generatJWT", r.Header.Get("X-User"))
+	user := r.Header.Get("X-User")
+	w.Header().Set("Content-Type", "application/json")
+
+	if len(user) == 0 || user == "" {
+
+		// fazer log user invalid
+		utils.ErrorResponse(w, errors.BadRequestf("header X-User not exists"))
+		return
+	}
+
+	token, err := extractToken(r)
+	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		utils.ErrorResponse(w, errors.Unauthorizedf("Unauthorized error: %v", err))
+		return
+	}
+	tokenJwt, err := s.service.TokenIsValid(token)
+
+	if err != nil && tokenJwt == nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		utils.ErrorResponse(w, errors.Unauthorizedf("Unauthorized error: %v", err))
+		return
+	}
 }
 
+// @Summary HealthCheckHandler
+// @Description cria uma simulation de emprestimo
+// @Tags simulation
+// @Accept  json
+// @Produce  json
+// @Success 200 {healthCheckHandler} healthCheckHandler
+// @Router /v1/health-handler [GET]
 func (s *SimulationHandler) HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
 	start := time.Now()
 

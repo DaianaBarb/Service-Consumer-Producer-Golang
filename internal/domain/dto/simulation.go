@@ -1,6 +1,9 @@
 package dto
 
-import "time"
+import (
+	"project-golang/internal/domain/model"
+	"time"
+)
 
 type AntiFraudRequest struct {
 	BorrowerId string  `json:"borrowerId"`
@@ -13,6 +16,11 @@ type AntiFraudResponse struct {
 
 type QueuePublishPayload struct {
 	SimulationId string `json:"simulationId "`
+}
+
+type JwtRequest struct {
+	CredorId string `json:"credorId "`
+	Escopo   string `json:"escopoId "`
 }
 
 type SimulationRequest struct {
@@ -36,4 +44,16 @@ type SimulationResponse struct {
 type SimulationResponseBorrowerRequest struct {
 	SimulationId string `json:"simulationId "`
 	Response     bool   `json:"response "`
+}
+
+type JwtResponse struct {
+	Token string `json:"token "`
+}
+
+func ToPayloadJWTModel(r JwtRequest) *model.PayloadJWT {
+	return &model.PayloadJWT{
+		CredorID: r.CredorId,
+		Escopo:   r.CredorId,
+	}
+
 }

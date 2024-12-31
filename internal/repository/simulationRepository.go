@@ -21,11 +21,21 @@ type IRepository interface {
 	FindByIdBorrower(borrwerId string) (*entity.Borrower, error)
 	UpdateSetup(setupId string, newSetup *entity.Setup) error
 	UpdateSimulationStatus(simulationId string, status string) error
+	Ping() error
 }
 
 type Repository struct {
 	db     *sql.DB
 	logger logger.ILogCloudWatch
+}
+
+// Ping implements IRepository.
+func (r *Repository) Ping() error {
+	err := r.db.Ping()
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func NewRepository(db *sql.DB, log logger.ILogCloudWatch) IRepository {

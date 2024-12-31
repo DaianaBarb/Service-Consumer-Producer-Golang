@@ -1,8 +1,16 @@
 package handlres
 
 import (
+	"context"
+	"encoding/json"
+	"fmt"
 	"net/http"
+	"project-golang/internal/domain/dto"
 	service "project-golang/internal/services"
+	"project-golang/internal/utils"
+	"project-golang/internal/utils/errors"
+	"strings"
+	"time"
 )
 
 type ISimulationHandler interface {
@@ -16,18 +24,56 @@ type ISimulationHandler interface {
 	UpdateSimulationStatus(w http.ResponseWriter, r *http.Request)
 	SimulationResponseBorrower(w http.ResponseWriter, r *http.Request)
 	GenerateJWTw(w http.ResponseWriter, r *http.Request)
+	HealthCheckHandler(w http.ResponseWriter, r *http.Request)
 }
 
 type SimulationHandler struct {
-	service *service.ISimulationService
+	service service.ISimulationService
 }
 
 // GenerateJWTw implements ISimulationHandler.
 func (s *SimulationHandler) GenerateJWTw(w http.ResponseWriter, r *http.Request) {
-	panic("unimplemented")
+	ctx := context.Background()
+	ctx = context.WithValue(ctx, "generatJWT", r.Header.Get("X-User"))
+	user := r.Header.Get("X-User")
+	w.Header().Set("Content-Type", "application/json")
+
+	if len(user) == 0 || user == "" {
+
+		// fazer log user invalid
+		utils.ErrorResponse(w, errors.BadRequestf("header X-User not exists"))
+		return
+	}
+	request := &dto.JwtRequest{}
+
+	err := json.NewDecoder(r.Body).Decode(&request)
+	if err != nil {
+		//logar error
+		utils.ErrorResponse(w, errors.UnprocessableEntityf("unprocessable entity error: %v", err))
+		return
+	}
+	error := utils.ValidateStruct(&request)
+	if error != nil {
+		//logar error
+		utils.ErrorResponse(w, errors.BadRequestf("bad request error: %v", err))
+		return
+	}
+
+	token, err := s.service.GenerateJWT(*dto.ToPayloadJWTModel(*request))
+
+	if error != nil {
+		//logar error
+		utils.ErrorResponse(w, errors.Internalf("request error: %v", err))
+		return
+	}
+
+	utils.SuccessResponse(w, http.StatusCreated,  dto.JwtResponse{
+		Token: token,
+	})
+
 }
 
-func NewSimulationHandler(serv *service.ISimulationService) ISimulationHandler {
+func NewSimulationHandler(serv service.ISimulationService) ISimulationHandler {
 	return &SimulationHandler{service: serv}
 }
 
@@ -40,7 +86,6 @@ func (s *SimulationHandler) CreatedBorrower(w http.ResponseWriter, r *http.Reque
 func (s *SimulationHandler) CreatedSetup(w http.ResponseWriter, r *http.Request) {
 	panic("unimplemented")
 }
-
 
 // @Summary cria uma simulation
 // @Description cria uma simulation de emprestimo
@@ -80,4 +125,36 @@ func (s *SimulationHandler) UpdateSimulationStatus(w http.ResponseWriter, r *htt
 
 func (s *SimulationHandler) SimulationResponseBorrower(w http.ResponseWriter, r *http.Request) {
 	panic("unimplemented")
+}
+
+func (s *SimulationHandler) HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
+	start := time.Now()
+
+	// Testa a conexão com o banco
+	err := s.service.Ping()
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(fmt.Sprintf(`{"status": "DOWN", "error": "%v"}`, err)))
+		return
+	}
+
+	// Responde com sucesso
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(fmt.Sprintf(`{"status": "UP", "response_time": "%v"}`, time.Since(start))))
+}
+
+func extractToken(r *http.Request) (string, error) {
+	// Obtém o cabeçalho Authorization
+	authHeader := r.Header.Get("Authorization")
+	if authHeader == "" {
+		return "", fmt.Errorf("cabeçalho Authorization ausente")
+	}
+
+	// O cabeçalho deve começar com "Bearer "
+	parts := strings.Split(authHeader, " ")
+	if len(parts) != 2 || parts[0] != "Bearer" {
+		return "", fmt.Errorf("formato inválido do cabeçalho Authorization")
+	}
+
+	return parts[1], nil
 }

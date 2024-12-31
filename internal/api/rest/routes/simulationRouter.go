@@ -31,6 +31,11 @@ func (s *Routes) RegisterRoutes() {
 	c.HandleFunc("/v1/simulation", s.handlerSimulation.UpdateSetup).Methods("PUT")
 	c.HandleFunc("/v1/simulation", s.handlerSimulation.UpdateSimulationStatus).Methods("PUT")
 	c.HandleFunc("/v1/simulation/response-borrower", s.handlerSimulation.SimulationResponseBorrower).Methods("POST")
+	c.HandleFunc("/helth/db", s.handlerSimulation.HealthCheckHandler).Methods("GET")
+	c.HandleFunc("/health/app", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{"status":"UP"}`))
+	}).Methods("GET")
 
 	fmt.Println(" online na porta 8080")
 	http.ListenAndServe(":8080", c)

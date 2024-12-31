@@ -33,6 +33,8 @@ type ISimulationService interface {
 	UpdateSetup(setupId string, newSetup *model.Setup) error
 	UpdateSimulationStatus(simulationId string, status string) error
 	SimulationResponseBorrower(response *model.SimulationResponseBorrower) error
+	GenerateJWT(payload model.PayloadJWT) (string, error)
+	Ping() error
 }
 
 type SimulationService struct {
@@ -290,4 +292,14 @@ func (s *SimulationService) GenerateJWT(payload model.PayloadJWT) (string, error
 	}
 
 	return tokenString, nil
+}
+
+func (s *SimulationService) Ping() error {
+
+	err := s.repository.Ping()
+	if err != nil {
+
+		return err
+	}
+	return nil
 }

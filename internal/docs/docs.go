@@ -59,8 +59,8 @@ var SwaggerInfo = &swag.Spec{
 	Description:      "Esta é uma API de simulação de emprestimos documentada com Swagger em Go.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
-	LeftDelim:        "{{",
-	RightDelim:       "}}",
+	//LeftDelim:        "{{",
+	//RightDelim:       "}}",
 }
 
 func init() {

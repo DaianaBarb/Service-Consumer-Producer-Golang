@@ -35,6 +35,7 @@ type ISimulationService interface {
 	SimulationResponseBorrower(response *model.SimulationResponseBorrower) error
 	GenerateJWT(payload model.PayloadJWT) (string, error)
 	TokenIsValid(tokenString string) (*jwt.Token, error)
+	FindByParamSimulations(param *model.Params) (dto.SimulationPaginationResponse, error)
 
 	Ping() error
 }
@@ -42,6 +43,11 @@ type ISimulationService interface {
 type SimulationService struct {
 	repository repository.IRepository
 	sqsClient  sqsAws.Client
+}
+
+// FindByParamSimulations implements ISimulationService.
+func (s *SimulationService) FindByParamSimulations(param *model.Params) (dto.SimulationPaginationResponse, error) {
+	panic("unimplemented")
 }
 
 func NewSimulationService(repo repository.IRepository, sqs sqsAws.Client) ISimulationService {

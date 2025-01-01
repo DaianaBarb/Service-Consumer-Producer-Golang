@@ -20,7 +20,7 @@ type IRoutes interface {
 func (s *Routes) RegisterRoutes() {
 
 	c := mux.NewRouter()
-
+	c.HandleFunc("/v1/generateJwt", s.handlerSimulation.GenerateJWTw).Methods("GET")
 	c.HandleFunc("/v1/simulation", s.handlerSimulation.CreatedSimulation).Methods("POST")
 	c.HandleFunc("/v1/setup", s.handlerSimulation.CreatedSetup).Methods("POST")
 	c.HandleFunc("/v1/borrower", s.handlerSimulation.CreatedBorrower).Methods("POST")
@@ -28,9 +28,10 @@ func (s *Routes) RegisterRoutes() {
 	c.HandleFunc("/v1/setup/{id}", s.handlerSimulation.FindByIdSetup).Methods("GET")
 	c.HandleFunc("/v1/borrower/{id}", s.handlerSimulation.FindByIdBorrower).Methods("GET")
 	c.PathPrefix("/swagger/").Handler(http.StripPrefix("/swagger/", http.FileServer(http.Dir("./swagger/"))))
-	c.HandleFunc("/v1/simulation", s.handlerSimulation.UpdateSetup).Methods("PUT")
+	c.HandleFunc("/v1/setup", s.handlerSimulation.UpdateSetup).Methods("PUT")
 	c.HandleFunc("/v1/simulation", s.handlerSimulation.UpdateSimulationStatus).Methods("PUT")
-	c.HandleFunc("/v1/simulation/response-borrower", s.handlerSimulation.SimulationResponseBorrower).Methods("POST")
+	c.HandleFunc("/v1/simulation/borrower", s.handlerSimulation.BorrowerResponseToSimulation).Methods("POST")
+	c.HandleFunc("/v1/simulation", s.handlerSimulation.FindSimulationsByParam).Methods("GET").Queries()
 	c.HandleFunc("/helth/db", s.handlerSimulation.HealthCheckHandler).Methods("GET")
 	c.HandleFunc("/health/app", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)

@@ -1,4 +1,73 @@
 basePath: /v1/simulation
+definitions:
+  dto.BorrowerResponse:
+    properties:
+      borrewerId:
+        type: string
+      cpf:
+        type: string
+      createdAt:
+        type: string
+      email:
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  dto.SetupResponse:
+    properties:
+      capital:
+        type: number
+      createdAt:
+        type: string
+      escope:
+        type: string
+      escopeIdValid:
+        type: boolean
+      fees:
+        description: juros
+        type: number
+      interestRate:
+        description: taxa de juros
+        type: number
+      setupId:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  dto.SimulationPaginationResponse:
+    properties:
+      page:
+        type: string
+      pageSize:
+        type: string
+      simulations:
+        items:
+          $ref: '#/definitions/dto.SimulationResponse'
+        type: array
+    type: object
+  dto.SimulationResponse:
+    properties:
+      borrowerId:
+        type: string
+      createdAt:
+        type: string
+      interestRate:
+        type: number
+      loanValue:
+        type: number
+      numberOfInstallments:
+        type: number
+      satus:
+        type: string
+      simulationId:
+        type: string
+      updatedAt:
+        type: string
+    type: object
 host: localhost:8080
 info:
   contact:
@@ -13,19 +82,118 @@ info:
   title: DOC com o  Swagger
   version: "1.0"
 paths:
-  /v1/simulation:
+  /v1/borrower/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Find By Id Borrower
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.BorrowerResponse'
+      summary: Find By Id Borrower
+      tags:
+      - simulation
+  /v1/health-handler:
+    get:
+      responses: {}
+  /v1/setup:
     post:
       consumes:
       - application/json
-      description: cria uma simulation de emprestimo
+      description: Created Setup
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+      summary: Created Setup
+      tags:
+      - Borrower
+    put:
+      consumes:
+      - application/json
+      description: Update Setup
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Update Setup
+      tags:
+      - Setup
+  /v1/setup/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Find By Id Setup
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SetupResponse'
+      summary: Find By Id Setup
+      tags:
+      - Borrower
+  /v1/simulation:
+    get:
+      consumes:
+      - application/json
+      description: 'Find Simulations By param, with all the parameters of the simulation
+        object with the page and pageSize as desired ex: status="acepted", borrowerId=12345'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            type: simulation
-      summary: cria uma simulation
+            $ref: '#/definitions/dto.SimulationPaginationResponse'
+      summary: Find Simulations By Param
+      tags:
+      - simulations
+    post:
+      consumes:
+      - application/json
+      description: cCreated Simulation
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+      summary: Created Simulation
+      tags:
+      - Setup
+    put:
+      consumes:
+      - application/json
+      description: Update Simulation Status
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Update Simulation Status
+      tags:
+      - simulation
+  /v1/simulation/{id}:
+    get:
+      responses: {}
+  /v1/simulation/borrower:
+    post:
+      consumes:
+      - application/json
+      description: borrower's response to the loan simulation
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Borrower Response To Simulation
       tags:
       - simulation
 swagger: "2.0"

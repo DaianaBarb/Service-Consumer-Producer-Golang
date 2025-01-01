@@ -6,11 +6,14 @@ import (
 	"fmt"
 	"net/http"
 	"project-golang/internal/domain/dto"
+	"project-golang/internal/domain/model"
 	service "project-golang/internal/services"
 	"project-golang/internal/utils"
 	"project-golang/internal/utils/errors"
 	"strings"
 	"time"
+
+	"github.com/gorilla/mux"
 )
 
 type ISimulationHandler interface {
@@ -22,9 +25,10 @@ type ISimulationHandler interface {
 	FindByIdBorrower(w http.ResponseWriter, r *http.Request)
 	UpdateSetup(w http.ResponseWriter, r *http.Request)
 	UpdateSimulationStatus(w http.ResponseWriter, r *http.Request)
-	SimulationResponseBorrower(w http.ResponseWriter, r *http.Request)
+	BorrowerResponseToSimulation(w http.ResponseWriter, r *http.Request)
 	GenerateJWTw(w http.ResponseWriter, r *http.Request)
 	HealthCheckHandler(w http.ResponseWriter, r *http.Request)
+	FindSimulationsByParam(w http.ResponseWriter, r *http.Request)
 }
 
 type SimulationHandler struct {
@@ -35,13 +39,55 @@ func NewSimulationHandler(serv service.ISimulationService) ISimulationHandler {
 	return &SimulationHandler{service: serv}
 }
 
+// @Summary Find Simulations By Param
+// @Description Find Simulations By param, with all the parameters of the simulation object with the page and pageSize as desired ex: status="acepted", borrowerId=12345
+// @Tags simulations
+// @Accept  json
+// @Produce  json
+//
+//	@Success 201 {object} dto.SimulationPaginationResponse
+//
+// exemple:{ "simulations": [
+//
+//	    {
+//	      "simulationId": "sim123",
+//	      "borrowerId": "bor123",
+//	      "loanValue": 50000.00,
+//	      "numberOfInstallments": 24,
+//	      "createdAt": "2024-12-25T15:04:05Z",
+//	      "updatedAt": "2024-12-25T15:04:05Z",
+//	      "satus": "APPROVED",
+//	      "interestRate": 3.5
+//	    },
+//	    {
+//	      "simulationId": "sim124",
+//	      "borrowerId": "bor124",
+//	      "loanValue": 30000.00,
+//	      "numberOfInstallments": 12,
+//	      "createdAt": "2024-12-25T16:10:15Z",
+//	      "updatedAt": "2024-12-25T16:10:15Z",
+//	      "satus": "PENDING",
+//	      "interestRate": 2.8
+//	    }
+//	  ],
+//	  "page": "1",
+//	  "pageSize": "10"
+//	} JwtRequest
+//
+// @Router /v1/simulation [GET]
+// FindSimulationsByParam implements ISimulationHandler.
+func (s *SimulationHandler) FindSimulationsByParam(w http.ResponseWriter, r *http.Request) {
+	panic("unimplemented")
+}
+
 // @Summary GenerateJWTw
-// @Description gera um token jwt pra solicitação de emprestimo
+// @Description generate token jwt
 // @Tags GenerateJWTw
 // @Accept  json
 // @Produce  json
-// @Success 201 {jwtRequest} JwtRequest
-// @Router /v1/simulation/generateJwt [POST]
+// @Success 201 {object} dto.JwtResponse
+// {"token": "12233hdjfj474748wkdmms"} JwtRequest
+// @Router /v1/generateJwt [POST]
 
 func (s *SimulationHandler) GenerateJWTw(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
@@ -84,12 +130,12 @@ func (s *SimulationHandler) GenerateJWTw(w http.ResponseWriter, r *http.Request)
 
 }
 
-// @Summary CreatedBorrower
-// @Description cria um Borrower
+// @Summary Created Borrower
+// @Description Created Borrower
 // @Tags Borrower
 // @Accept  json
 // @Produce  json
-// @Success 201 {borrower} Borrower
+// @Success 201
 // @Router /v1/Borrower [POST]
 
 func (s *SimulationHandler) CreatedBorrower(w http.ResponseWriter, r *http.Request) {
@@ -108,14 +154,14 @@ func (s *SimulationHandler) CreatedBorrower(w http.ResponseWriter, r *http.Reque
 
 	token, err := extractToken(r)
 	if err != nil {
-		w.WriteHeader(http.StatusUnauthorized)
+
 		utils.ErrorResponse(w, errors.Unauthorizedf("Unauthorized error: %v", err))
 		return
 	}
 	tokenJwt, err := s.service.TokenIsValid(token)
 
 	if err != nil && tokenJwt == nil {
-		w.WriteHeader(http.StatusUnauthorized)
+
 		utils.ErrorResponse(w, errors.Unauthorizedf("Unauthorized error: %v", err))
 		return
 	}
@@ -147,12 +193,12 @@ func (s *SimulationHandler) CreatedBorrower(w http.ResponseWriter, r *http.Reque
 
 }
 
-// @Summary CreatedSetup
-// @Description cria um Setup
-// @Tags Setup
+// @Summary Created Setup
+// @Description Created Setup
+// @Tags Borrower
 // @Accept  json
 // @Produce  json
-// @Success 201 {setup} Setup
+// @Success 201
 // @Router /v1/setup [POST]
 // CreatedSetup implements ISimulationHandler.
 func (s *SimulationHandler) CreatedSetup(w http.ResponseWriter, r *http.Request) {
@@ -171,14 +217,14 @@ func (s *SimulationHandler) CreatedSetup(w http.ResponseWriter, r *http.Request)
 
 	token, err := extractToken(r)
 	if err != nil {
-		w.WriteHeader(http.StatusUnauthorized)
+
 		utils.ErrorResponse(w, errors.Unauthorizedf("Unauthorized error: %v", err))
 		return
 	}
 	tokenJwt, err := s.service.TokenIsValid(token)
 
 	if err != nil && tokenJwt == nil {
-		w.WriteHeader(http.StatusUnauthorized)
+
 		utils.ErrorResponse(w, errors.Unauthorizedf("Unauthorized error: %v", err))
 		return
 	}
@@ -210,12 +256,12 @@ func (s *SimulationHandler) CreatedSetup(w http.ResponseWriter, r *http.Request)
 
 }
 
-// @Summary cria uma simulation
-// @Description cria uma simulation de emprestimo
-// @Tags simulation
+// @Summary Created Simulation
+// @Description cCreated Simulation
+// @Tags Setup
 // @Accept  json
 // @Produce  json
-// @Success 201 {simulation} Simulation
+// @Success 201
 // @Router /v1/simulation [POST]
 func (s *SimulationHandler) CreatedSimulation(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
@@ -232,14 +278,14 @@ func (s *SimulationHandler) CreatedSimulation(w http.ResponseWriter, r *http.Req
 
 	token, err := extractToken(r)
 	if err != nil {
-		w.WriteHeader(http.StatusUnauthorized)
+
 		utils.ErrorResponse(w, errors.Unauthorizedf("Unauthorized error: %v", err))
 		return
 	}
 	tokenJwt, err := s.service.TokenIsValid(token)
 
 	if err != nil && tokenJwt == nil {
-		w.WriteHeader(http.StatusUnauthorized)
+
 		utils.ErrorResponse(w, errors.Unauthorizedf("Unauthorized error: %v", err))
 		return
 	}
@@ -265,6 +311,25 @@ func (s *SimulationHandler) CreatedSimulation(w http.ResponseWriter, r *http.Req
 
 }
 
+// @Summary Find By Id Borrower
+// @Description Find By Id Borrower
+// @Tags simulation
+// @Accept  json
+// @Produce  json
+//
+//	@Success 200 {object} dto.BorrowerResponse
+//
+//	"example:{
+//		  "borrowerId": "12345",
+//		  "name": "João Silva",
+//		  "phone": "123456789",
+//		  "email": "joao.silva@email.com",
+//		  "cpf": "123.456.789-00",
+//		  "createdAt": "2024-12-25T15:04:05Z",
+//		  "updatedAt": "2024-12-25T15:04:05Z"
+//		} "
+//
+// @Router /v1/borrower/{id} [GET]
 // FindByIdBorrower implements ISimulationHandler.
 func (s *SimulationHandler) FindByIdBorrower(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
@@ -281,19 +346,66 @@ func (s *SimulationHandler) FindByIdBorrower(w http.ResponseWriter, r *http.Requ
 
 	token, err := extractToken(r)
 	if err != nil {
-		w.WriteHeader(http.StatusUnauthorized)
+
 		utils.ErrorResponse(w, errors.Unauthorizedf("Unauthorized error: %v", err))
 		return
 	}
 	tokenJwt, err := s.service.TokenIsValid(token)
 
 	if err != nil && tokenJwt == nil {
-		w.WriteHeader(http.StatusUnauthorized)
+
 		utils.ErrorResponse(w, errors.Unauthorizedf("Unauthorized error: %v", err))
 		return
 	}
+
+	vars := mux.Vars(r)
+	id, ok := vars["id"]
+	if !ok {
+
+		utils.ErrorResponse(w, errors.BadRequestf("error to parser query params: %v", err))
+		return
+	}
+
+	borrower, err := s.service.FindByIdBorrower(id)
+	if err != nil {
+
+		utils.ErrorResponse(w, errors.Internalf("error to parser query params: %v", err))
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	utils.SuccessResponse(w, http.StatusCreated, dto.BorrowerResponse{
+		BorrowerId: borrower.BorrowerId,
+		Name:       borrower.Name,
+		Phone:      borrower.Phone,
+		Email:      borrower.Email,
+		Cpf:        borrower.Cpf,
+		CreatedAt:  borrower.CreatedAt,
+		UpdateAt:   borrower.UpdateAt,
+	})
+
 }
 
+// @Summary Find By Id Setup
+// @Description Find By Id Setup
+// @Tags Borrower
+// @Accept  json
+// @Produce  json
+//
+//	@Success 200 {object} dto.SetupResponse
+//
+//	"example:{
+//		  "setupId": "abc123",
+//		  "capital": 10000.00,
+//		  "fees": 500.00,
+//		  "interestRate": 5.5,
+//		  "escope": "Investment",
+//		  "escopeIdValid": true,
+//		  "createdAt": "2024-12-25T15:04:05Z",
+//		  "updatedAt": "2024-12-25T15:04:05Z"
+//		}"
+//
+// @Router /v1/setup/{id} [GET]
 // FindByIdSetup implements ISimulationHandler.
 func (s *SimulationHandler) FindByIdSetup(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
@@ -310,19 +422,64 @@ func (s *SimulationHandler) FindByIdSetup(w http.ResponseWriter, r *http.Request
 
 	token, err := extractToken(r)
 	if err != nil {
-		w.WriteHeader(http.StatusUnauthorized)
+
 		utils.ErrorResponse(w, errors.Unauthorizedf("Unauthorized error: %v", err))
 		return
 	}
 	tokenJwt, err := s.service.TokenIsValid(token)
 
 	if err != nil && tokenJwt == nil {
-		w.WriteHeader(http.StatusUnauthorized)
+
 		utils.ErrorResponse(w, errors.Unauthorizedf("Unauthorized error: %v", err))
 		return
 	}
+
+	vars := mux.Vars(r)
+	id, ok := vars["id"]
+	if !ok {
+
+		utils.ErrorResponse(w, errors.BadRequestf("error to parser query params: %v", err))
+		return
+	}
+
+	setup, err := s.service.FindByIdSetup(id)
+	if err != nil {
+
+		utils.ErrorResponse(w, errors.Internalf("error to parser query params: %v", err))
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	utils.SuccessResponse(w, http.StatusCreated, dto.SetupResponse{
+		SetupId:       setup.SetupId,
+		Capital:       setup.Capital,
+		Fees:          setup.Fees,
+		InterestRate:  setup.InterestRate,
+		Escope:        setup.Escope,
+		EscopeIdValid: setup.EscopeIsValid,
+		CreatedAt:     setup.CreatedAt,
+		UpdatedAt:     setup.UpdatedAt,
+	})
 }
 
+// @Summary Find By Id Simulation
+// @Description Find By Id Simulation
+// @Tags simulation
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} dto.SimulationResponse
+// example:{
+//   "simulationId": "sim123",
+//   "borrowerId": "bor123",
+//   "loanValue": 50000.00,
+//   "numberOfInstallments": 24,
+//   "createdAt": "2024-12-25T15:04:05Z",
+//   "updatedAt": "2024-12-25T15:04:05Z",
+//   "satus": "APPROVED",
+//   "interestRate": 3.5
+// } FindByIdSimulation
+
+// @Router /v1/simulation/{id} [GET]
 // FindByIdSimulation implements ISimulationHandler.
 func (s *SimulationHandler) FindByIdSimulation(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
@@ -339,19 +496,53 @@ func (s *SimulationHandler) FindByIdSimulation(w http.ResponseWriter, r *http.Re
 
 	token, err := extractToken(r)
 	if err != nil {
-		w.WriteHeader(http.StatusUnauthorized)
+
 		utils.ErrorResponse(w, errors.Unauthorizedf("Unauthorized error: %v", err))
 		return
 	}
 	tokenJwt, err := s.service.TokenIsValid(token)
 
 	if err != nil && tokenJwt == nil {
-		w.WriteHeader(http.StatusUnauthorized)
+
 		utils.ErrorResponse(w, errors.Unauthorizedf("Unauthorized error: %v", err))
 		return
 	}
+
+	vars := mux.Vars(r)
+	id, ok := vars["id"]
+	if !ok {
+
+		utils.ErrorResponse(w, errors.BadRequestf("error to parser query params: %v", err))
+		return
+	}
+
+	simu, err := s.service.FindByIdSimulation(id)
+	if err != nil {
+
+		utils.ErrorResponse(w, errors.Internalf("error to parser query params: %v", err))
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	utils.SuccessResponse(w, http.StatusCreated, dto.SimulationResponse{
+		SimulationId:         simu.SimulationId,
+		InterestRate:         simu.InterestRate,
+		CreatedAt:            simu.CreatedAt,
+		UpdatedAt:            simu.UpdatedAt,
+		BorrowerId:           simu.BorrowerId,
+		LoanValue:            simu.LoanValue,
+		NumberOfInstallments: simu.NumberOfInstallments,
+		Status:               simu.Status,
+	})
 }
 
+// @Summary Update Setup
+// @Description Update Setup
+// @Tags Setup
+// @Accept  json
+// @Produce  json
+// @Success 200
+// @Router /v1/setup [PUT]
 // UpdateSetup implements ISimulationHandler.
 func (s *SimulationHandler) UpdateSetup(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
@@ -368,19 +559,26 @@ func (s *SimulationHandler) UpdateSetup(w http.ResponseWriter, r *http.Request) 
 
 	token, err := extractToken(r)
 	if err != nil {
-		w.WriteHeader(http.StatusUnauthorized)
+
 		utils.ErrorResponse(w, errors.Unauthorizedf("Unauthorized error: %v", err))
 		return
 	}
 	tokenJwt, err := s.service.TokenIsValid(token)
 
 	if err != nil && tokenJwt == nil {
-		w.WriteHeader(http.StatusUnauthorized)
+
 		utils.ErrorResponse(w, errors.Unauthorizedf("Unauthorized error: %v", err))
 		return
 	}
 }
 
+// @Summary Update Simulation Status
+// @Description Update Simulation Status
+// @Tags simulation
+// @Accept  json
+// @Produce  json
+// @Success 200
+// @Router /v1/simulation [PUT]
 // UpdateSimulationStatus implements ISimulationHandler.
 func (s *SimulationHandler) UpdateSimulationStatus(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
@@ -397,20 +595,27 @@ func (s *SimulationHandler) UpdateSimulationStatus(w http.ResponseWriter, r *htt
 
 	token, err := extractToken(r)
 	if err != nil {
-		w.WriteHeader(http.StatusUnauthorized)
+
 		utils.ErrorResponse(w, errors.Unauthorizedf("Unauthorized error: %v", err))
 		return
 	}
 	tokenJwt, err := s.service.TokenIsValid(token)
 
 	if err != nil && tokenJwt == nil {
-		w.WriteHeader(http.StatusUnauthorized)
+
 		utils.ErrorResponse(w, errors.Unauthorizedf("Unauthorized error: %v", err))
 		return
 	}
 }
 
-func (s *SimulationHandler) SimulationResponseBorrower(w http.ResponseWriter, r *http.Request) {
+// @Summary Borrower Response To Simulation
+// @Description borrower's response to the loan simulation
+// @Tags simulation
+// @Accept  json
+// @Produce  json
+// @Success 200
+// @Router /v1/simulation/borrower [POST]
+func (s *SimulationHandler) BorrowerResponseToSimulation(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
 	ctx = context.WithValue(ctx, "generatJWT", r.Header.Get("X-User"))
 	user := r.Header.Get("X-User")
@@ -425,17 +630,52 @@ func (s *SimulationHandler) SimulationResponseBorrower(w http.ResponseWriter, r 
 
 	token, err := extractToken(r)
 	if err != nil {
-		w.WriteHeader(http.StatusUnauthorized)
+
 		utils.ErrorResponse(w, errors.Unauthorizedf("Unauthorized error: %v", err))
 		return
 	}
 	tokenJwt, err := s.service.TokenIsValid(token)
 
 	if err != nil && tokenJwt == nil {
-		w.WriteHeader(http.StatusUnauthorized)
+
 		utils.ErrorResponse(w, errors.Unauthorizedf("Unauthorized error: %v", err))
 		return
 	}
+	request := &dto.BorrowerResponseTosimulationRequest{}
+
+	err = json.NewDecoder(r.Body).Decode(&request)
+	if err != nil {
+		//logar error
+
+		utils.ErrorResponse(w, errors.UnprocessableEntityf("unprocessable entity error: %v", err))
+		return
+	}
+	if request.Status != "acepted" && request.Status != "rejected" {
+
+		utils.ErrorResponse(w, errors.UnprocessableEntityf("unprocessable entity error: %v", err))
+		return
+
+	}
+	error := utils.ValidateStruct(&request)
+	if error != nil {
+		//logar error
+
+		utils.ErrorResponse(w, errors.BadRequestf("bad request error: %v", err))
+		return
+	}
+
+	err = s.service.SimulationResponseBorrower(&model.SimulationResponseBorrower{SimulationId: request.SimulationId,
+		Status: request.Status})
+
+	if err != nil {
+		//logar error
+
+		utils.ErrorResponse(w, errors.Internalf("request error: %v", err))
+		return
+	}
+
+	utils.SuccessResponse(w, http.StatusOK, nil)
+
 }
 
 // @Summary HealthCheckHandler
@@ -443,7 +683,8 @@ func (s *SimulationHandler) SimulationResponseBorrower(w http.ResponseWriter, r 
 // @Tags simulation
 // @Accept  json
 // @Produce  json
-// @Success 200 {healthCheckHandler} healthCheckHandler
+// @Success 200 {object} dto.HelfCheckResponse
+
 // @Router /v1/health-handler [GET]
 func (s *SimulationHandler) HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
 	start := time.Now()
@@ -451,14 +692,16 @@ func (s *SimulationHandler) HealthCheckHandler(w http.ResponseWriter, r *http.Re
 	// Testa a conexão com o banco
 	err := s.service.Ping()
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+
 		w.Write([]byte(fmt.Sprintf(`{"status": "DOWN", "error": "%v"}`, err)))
 		return
 	}
 
 	// Responde com sucesso
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(fmt.Sprintf(`{"status": "UP", "response_time": "%v"}`, time.Since(start))))
+	utils.SuccessResponse(w, http.StatusOK, dto.HelfCheckResponse{
+		Status:        "UP",
+		Response_time: &start,
+	})
 }
 
 func extractToken(r *http.Request) (string, error) {

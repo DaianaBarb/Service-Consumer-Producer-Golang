@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"project-golang/internal/domain/entity"
+	"project-golang/internal/domain/model"
 	"project-golang/internal/logger"
 	"sync"
 )
@@ -21,6 +22,7 @@ type IRepository interface {
 	FindByIdBorrower(borrwerId string) (*entity.Borrower, error)
 	UpdateSetup(setupId string, newSetup *entity.Setup) error
 	UpdateSimulationStatus(simulationId string, status string) error
+	GetSimulations(param *model.Params) ([]entity.Simulation, error)
 	Ping() error
 }
 
@@ -232,4 +234,73 @@ func (r *Repository) FindByIdBorrower(borrwerId string) (*entity.Borrower, error
 
 	return borrwer, nil
 
+}
+
+func (r *Repository) GetSimulations(param *model.Params) ([]entity.Simulation, error) {
+
+	offset := (param.Page - 1) * param.PageSize
+	// Base query
+	query := `
+		SELECT id, borrower_id, interest_rate, status, loan_value,number_installments created_at,updated_at, simulation_id
+		FROM simulations
+		WHERE 1=1
+	`
+
+	// Dynamic filters
+	args := []interface{}{}
+	if param.Simu.BorrowerId != nil {
+		query += " AND borrower_id = $1"
+		args = append(args, *param.Simu.BorrowerId)
+	}
+	if param.Simu.InterestRate != nil {
+		query += fmt.Sprintf(" AND interest_rate = $%d", len(args)+1)
+		args = append(args, *param.Simu.InterestRate)
+	}
+	if param.Simu.Status != nil {
+		query += fmt.Sprintf(" AND status = $%d", len(args)+1)
+		args = append(args, *param.Simu.Status)
+	}
+	if param.Simu.LoanValue != nil {
+		query += fmt.Sprintf(" AND loan_value = $%d", len(args)+1)
+		args = append(args, *param.Simu.LoanValue)
+	}
+	if param.Simu.NumberOfInstallments != nil {
+		query += fmt.Sprintf(" AND number_installments = $%d", len(args)+1)
+		args = append(args, *param.Simu.NumberOfInstallments)
+	}
+	if param.Simu.CreatedAt != nil {
+		query += fmt.Sprintf(" AND created_at = $%d", len(args)+1)
+		args = append(args, *param.Simu.CreatedAt)
+	}
+	if param.Simu.UpdatedAt != nil {
+		query += fmt.Sprintf(" AND updated_at = $%d", len(args)+1)
+		args = append(args, *param.Simu.UpdatedAt)
+	}
+	if param.Simu.SimulationId != nil {
+		query += fmt.Sprintf(" AND simulation_id = $%d", len(args)+1)
+		args = append(args, *param.Simu.SimulationId)
+	}
+
+	// Adiciona paginação
+	query += fmt.Sprintf(" ORDER BY created_at DESC LIMIT $%d OFFSET $%d", len(args)+1, len(args)+2)
+	args = append(args, param.PageSize, offset)
+
+	// Executa a consulta
+	rows, err := r.db.Query(query, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	// Parse dos resultados
+	var simulations []entity.Simulation
+	for rows.Next() {
+		var sim entity.Simulation
+		if err := rows.Scan(&sim.SimulationId, &sim.BorrowerId, &sim.LoanValue, &sim.NumberOfInstallments, &sim.InterestRate, &sim.Status, &sim.CreatedAt, &sim.UpdatedAt); err != nil {
+			return nil, err
+		}
+		simulations = append(simulations, sim)
+	}
+
+	return simulations, nil
 }

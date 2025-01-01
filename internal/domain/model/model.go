@@ -144,3 +144,19 @@ func ToBorrowerEntity(bo *Borrower) *entity.Borrower {
 	}
 
 }
+type SimulationParam struct{
+	SimulationId         *string
+	BorrowerId           *string
+	LoanValue            *float64 // valor emprestimo
+	NumberOfInstallments *float64 // quantidade de parcelas
+	CreatedAt            *time.Time
+	UpdatedAt            *time.Time
+	Status               *string
+	InterestRate         *float64
+}
+
+type Params struct {
+	Simu     *SimulationParam
+	Page     int
+	PageSize int
+}

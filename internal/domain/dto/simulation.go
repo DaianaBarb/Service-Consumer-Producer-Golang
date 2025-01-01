@@ -30,6 +30,11 @@ type SimulationRequest struct {
 	InterestRate         float64 `json:"interestRate"`
 }
 
+type HelfCheckResponse struct {
+	Status        string     `json:"status"`
+	Response_time *time.Time `json:"response_time"`
+}
+
 type SimulationResponse struct {
 	SimulationId         string     `json:"simulationId "`
 	BorrowerId           string     `json:"borrowerId "`
@@ -39,6 +44,12 @@ type SimulationResponse struct {
 	UpdatedAt            *time.Time `json:"updatedAt "`
 	Status               string     `json:"satus"`
 	InterestRate         float64    `json:"interestRate "`
+}
+
+type SimulationPaginationResponse struct {
+	Simulations []SimulationResponse `json:"simulations "`
+	Page        string               `json:"page"`
+	PageSize    string               `json:"pageSize"`
 }
 
 type SimulationResponseBorrowerRequest struct {
@@ -72,7 +83,12 @@ type BorrowerResponse struct {
 	Email      string     `json:"email"`
 	Cpf        string     `json:"cpf"`
 	CreatedAt  *time.Time `json:"createdAt"`
-	UpdateAt   *time.Time `json:"updateAt"`
+	UpdateAt   *time.Time `json:"updatedAt"`
+}
+
+type BorrowerResponseTosimulationRequest struct {
+	SimulationId string `json:"simulationId"`
+	Status       string `json:"status"`
 }
 
 type SetupRequest struct {
@@ -89,7 +105,7 @@ type SetupResponse struct {
 	Escope        string     `json:"escope"`
 	EscopeIdValid bool       `json:"escopeIdValid"`
 	CreatedAt     *time.Time `json:"createdAt"`
-	UpdateAt      *time.Time `json:"updateAt"`
+	UpdatedAt     *time.Time `json:"updatedAt"`
 }
 
 func ToBorrowerModel(r *BorrowerRequest) *model.Borrower {

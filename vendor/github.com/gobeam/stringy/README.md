@@ -55,7 +55,12 @@ Convert string to camel case, snake case, kebab case / slugify, custom delimiter
      <tr>
          <td><a href="#suffixstring-string">Suffix</a></td>
          <td><a href="#acronym-string">Acronym</a></td>
+        <td><a href="#title-string">Title</a></td>
+     </tr>
+     <tr>
+         <td><a href="#pascalcaserule-string-string">PascalCase</a></td>
          <td></td>
+        <td></td>
      </tr>
 </table>
 
@@ -124,13 +129,13 @@ CamelCase is variadic function which takes one Param rule i.e slice of strings a
 
 ```go
   camelCase := stringy.New("ThisIsOne___messed up string. Can we Really camel-case It ?##")
-  fmt.Println(camelCase.CamelCase("?", "", "#", "")) // ThisIsOneMessedUpStringCanWeReallyCamelCaseIt
+  fmt.Println(camelCase.CamelCase("?", "", "#", "")) // thisIsOneMessedUpStringCanWeReallyCamelCaseIt
 ```
 look how it omitted ?## from string. If you dont want to omit anything and since it returns plain strings and you cant actually cap all or lower case all camelcase string its not required.
 
 ```go
   camelCase := stringy.New("ThisIsOne___messed up string. Can we Really camel-case It ?##")
-  fmt.Println(camelCase.CamelCase()) // ThisIsOneMessedUpStringCanWeReallyCamelCaseIt?##
+  fmt.Println(camelCase.CamelCase()) // thisIsOneMessedUpStringCanWeReallyCamelCaseIt?##
 ```
 
 #### ContainsAll(check ...string) bool
@@ -306,6 +311,15 @@ Tease takes two params length and indicator and it shortens given string on pass
   fmt.Println(teaseString.Tease(20, "...")) // Hello My name is Ros...
 ```
 
+#### Title() string
+
+Title returns string with first letter of each word in uppercase it can be chained on function which return StringManipulation interface.
+
+```go
+  title := stringy.New("hello roshan")
+  fmt.Println(title.Title()) // Hello Roshan
+```
+
 
 #### ToLower() string
 
@@ -364,6 +378,21 @@ Acronym func returns acronym of input string. You can chain ToUpper() which with
 ```go
   acronym := stringy.New("Laugh Out Loud")
 	fmt.Println(acronym.Acronym().ToLower()) // lol
+```
+
+#### PascalCase(rule ...string) string
+
+PascalCase is variadic function which takes one Param rule i.e slice of strings and it returns input type string in pascal case form and rule helps to omit character you want to omit from string. By default special characters like "_", "-","."," " are treated like word separator and treated accordingly by default and you don't have to worry about it.
+
+```go
+  pascalCase := stringy.New("ThisIsOne___messed up string. Can we Really pascal-case It ?##")
+  fmt.Println(pascalCase.PascalCase("?", "", "#", "")) // ThisIsOneMessedUpStringCanWeReallyPascalCaseIt
+```
+look how it omitted ?## from string. If you dont want to omit anything and since it returns plain strings and you cant actually cap all or lower case all camelcase string it's not required.
+
+```go
+  pascalCase := stringy.New("ThisIsOne___messed up string. Can we Really camel-case It ?##")
+  fmt.Println(pascalCase.PascalCase()) // ThisIsOneMessedUpStringCanWeReallyCamelCaseIt?##
 ```
 
 

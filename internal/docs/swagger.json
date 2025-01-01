@@ -17,9 +17,9 @@
     "host": "localhost:8080",
     "basePath": "/v1/simulation",
     "paths": {
-        "/v1/simulation": {
-            "post": {
-                "description": "cria uma simulation de emprestimo",
+        "/v1/borrower/{id}": {
+            "get": {
+                "description": "Find By Id Borrower",
                 "consumes": [
                     "application/json"
                 ],
@@ -29,14 +29,269 @@
                 "tags": [
                     "simulation"
                 ],
-                "summary": "cria uma simulation",
+                "summary": "Find By Id Borrower",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.BorrowerResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/health-handler": {
+            "get": {
+                "responses": {}
+            }
+        },
+        "/v1/setup": {
+            "put": {
+                "description": "Update Setup",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Setup"
+                ],
+                "summary": "Update Setup",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            },
+            "post": {
+                "description": "Created Setup",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Borrower"
+                ],
+                "summary": "Created Setup",
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    }
+                }
+            }
+        },
+        "/v1/setup/{id}": {
+            "get": {
+                "description": "Find By Id Setup",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Borrower"
+                ],
+                "summary": "Find By Id Setup",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SetupResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/simulation": {
+            "get": {
+                "description": "Find Simulations By param, with all the parameters of the simulation object with the page and pageSize as desired ex: status=\"acepted\", borrowerId=12345",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "simulations"
+                ],
+                "summary": "Find Simulations By Param",
                 "responses": {
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "type": "simulation"
+                            "$ref": "#/definitions/dto.SimulationPaginationResponse"
                         }
                     }
+                }
+            },
+            "put": {
+                "description": "Update Simulation Status",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "simulation"
+                ],
+                "summary": "Update Simulation Status",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            },
+            "post": {
+                "description": "cCreated Simulation",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Setup"
+                ],
+                "summary": "Created Simulation",
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    }
+                }
+            }
+        },
+        "/v1/simulation/borrower": {
+            "post": {
+                "description": "borrower's response to the loan simulation",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "simulation"
+                ],
+                "summary": "Borrower Response To Simulation",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/v1/simulation/{id}": {
+            "get": {
+                "responses": {}
+            }
+        }
+    },
+    "definitions": {
+        "dto.BorrowerResponse": {
+            "type": "object",
+            "properties": {
+                "borrewerId": {
+                    "type": "string"
+                },
+                "cpf": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.SetupResponse": {
+            "type": "object",
+            "properties": {
+                "capital": {
+                    "type": "number"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "escope": {
+                    "type": "string"
+                },
+                "escopeIdValid": {
+                    "type": "boolean"
+                },
+                "fees": {
+                    "description": "juros",
+                    "type": "number"
+                },
+                "interestRate": {
+                    "description": "taxa de juros",
+                    "type": "number"
+                },
+                "setupId": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.SimulationPaginationResponse": {
+            "type": "object",
+            "properties": {
+                "page": {
+                    "type": "string"
+                },
+                "pageSize": {
+                    "type": "string"
+                },
+                "simulations": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.SimulationResponse"
+                    }
+                }
+            }
+        },
+        "dto.SimulationResponse": {
+            "type": "object",
+            "properties": {
+                "borrowerId": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "interestRate": {
+                    "type": "number"
+                },
+                "loanValue": {
+                    "type": "number"
+                },
+                "numberOfInstallments": {
+                    "type": "number"
+                },
+                "satus": {
+                    "type": "string"
+                },
+                "simulationId": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
                 }
             }
         }

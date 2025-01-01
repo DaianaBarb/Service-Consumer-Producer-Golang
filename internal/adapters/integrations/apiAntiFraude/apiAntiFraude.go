@@ -12,7 +12,26 @@ import (
 	"github.com/sony/gobreaker"
 )
 
-func CheckAntiFraud(request *dto.AntiFraudRequest) (*dto.AntiFraudResponse, error) {
+var (
+	timeout = 10 * time.Second
+)
+
+type IApiAntifraude interface {
+	CheckAntiFraud(request *dto.AntiFraudRequest) (*dto.AntiFraudResponse, error)
+}
+
+type ApiAntifraude struct {
+	url  string
+	http *http.Client
+}
+
+func NewApiAntifraude() IApiAntifraude {
+	return &ApiAntifraude{url: os.Getenv("API_ANTIFRAUD"),
+		http: &http.Client{Timeout: timeout}}
+
+}
+
+func (a *ApiAntifraude) CheckAntiFraud(request *dto.AntiFraudRequest) (*dto.AntiFraudResponse, error) {
 	//CRIANDO CONFIG BREAKER
 	settings := gobreaker.Settings{
 		Name: "AntifraudeAPI",
@@ -20,12 +39,12 @@ func CheckAntiFraud(request *dto.AntiFraudRequest) (*dto.AntiFraudResponse, erro
 			// Abrir o circuito se mais de 5 falhas ocorrerem
 			return counts.ConsecutiveFailures > 5
 		},
-		Timeout: 10 * time.Second, // Tempo antes de tentar reabrir o circuito
+		Timeout: timeout, // Tempo antes de tentar reabrir o circuito
 	}
 	cb := gobreaker.NewCircuitBreaker(settings)
 
 	reqFunc := func() (interface{}, error) {
-		return antiFraudRequest(request)
+		return a.antiFraudRequest(request)
 	}
 
 	result, err := cb.Execute(reqFunc)
@@ -41,24 +60,20 @@ func CheckAntiFraud(request *dto.AntiFraudRequest) (*dto.AntiFraudResponse, erro
 
 }
 
-func antiFraudRequest(request *dto.AntiFraudRequest) (*dto.AntiFraudResponse, error) {
+func (a *ApiAntifraude) antiFraudRequest(request *dto.AntiFraudRequest) (*dto.AntiFraudResponse, error) {
 	var response = &dto.AntiFraudResponse{}
-	timeout := 5 * time.Second
 	jsonData, err := json.Marshal(request)
 	if err != nil {
 		return response, err
 	}
-	req, err := http.NewRequest("POST", os.Getenv("API_ANTIFRAUD"), bytes.NewBuffer(jsonData))
+	req, err := http.NewRequest("POST", a.url, bytes.NewBuffer(jsonData))
 	if err != nil {
 		return nil, fmt.Errorf("erro ao criar requisição: %w", err)
 	}
 	req.Header.Set("Content-Type", "application/json")
 	// Configurar o cliente HTTP com timeout
-	client := &http.Client{
-		Timeout: timeout,
-	}
 
-	resp, err := client.Do(req)
+	resp, err := a.http.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("erro ao fazer a requisição para a API antifraude: %w", err)
 	}

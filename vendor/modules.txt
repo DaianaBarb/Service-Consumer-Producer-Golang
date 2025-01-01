@@ -131,6 +131,7 @@ github.com/aws/smithy-go/transport/http
 github.com/aws/smithy-go/transport/http/internal/io
 # github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc
 ## explicit
+github.com/davecgh/go-spew/spew
 # github.com/fsnotify/fsnotify v1.8.0
 ## explicit; go 1.17
 github.com/fsnotify/fsnotify
@@ -215,6 +216,7 @@ github.com/mitchellh/reflectwalk
 github.com/pelletier/go-toml
 # github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2
 ## explicit
+github.com/pmezard/go-difflib/difflib
 # github.com/sirupsen/logrus v1.9.3
 ## explicit; go 1.13
 github.com/sirupsen/logrus
@@ -226,6 +228,11 @@ github.com/sony/gobreaker
 github.com/spf13/pflag
 # github.com/stretchr/objx v0.5.2
 ## explicit; go 1.20
+github.com/stretchr/objx
+# github.com/stretchr/testify v1.9.0
+## explicit; go 1.17
+github.com/stretchr/testify/assert
+github.com/stretchr/testify/mock
 # github.com/swaggo/swag v1.16.4
 ## explicit; go 1.18
 github.com/swaggo/swag

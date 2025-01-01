@@ -41,8 +41,9 @@ type ISimulationService interface {
 }
 
 type SimulationService struct {
-	repository repository.IRepository
-	sqsClient  sqsAws.Client
+	repository    repository.IRepository
+	sqsClient     sqsAws.Client
+	apiAntifraude apiantifraude.IApiAntifraude
 }
 
 // FindByParamSimulations implements ISimulationService.
@@ -50,9 +51,10 @@ func (s *SimulationService) FindByParamSimulations(param *model.Params) (dto.Sim
 	panic("unimplemented")
 }
 
-func NewSimulationService(repo repository.IRepository, sqs sqsAws.Client) ISimulationService {
+func NewSimulationService(repo repository.IRepository, sqs sqsAws.Client, anti apiantifraude.IApiAntifraude) ISimulationService {
 	return &SimulationService{repository: repo,
-		sqsClient: sqs}
+		sqsClient:     sqs,
+		apiAntifraude: anti}
 }
 
 // SimulationResponseBorrower implements ISimulationService.
@@ -189,7 +191,7 @@ func (s *SimulationService) UpdateSimulationStatus(simulationId string, status s
 
 func (s *SimulationService) checkAntiFraude(request *dto.AntiFraudRequest) (*dto.AntiFraudResponse, error) {
 
-	response, err := apiantifraude.CheckAntiFraud(request)
+	response, err := s.apiAntifraude.CheckAntiFraud(request)
 	if err != nil {
 		return nil, err
 	}

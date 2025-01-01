@@ -17,6 +17,7 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/sirupsen/logrus v1.9.3
 	github.com/sony/gobreaker v1.0.0
+	github.com/stretchr/testify v1.9.0
 	github.com/swaggo/swag v1.16.4
 	go.uber.org/fx v1.23.0
 	golang.org/x/text v0.21.0

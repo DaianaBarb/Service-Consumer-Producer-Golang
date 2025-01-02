@@ -1,2 +1,16 @@
-volume/
+.volume/
 .history/
+
+bin
+
+.idea
+assets
+
+.env
+.dccache
+
+config/.dev.env
+.sandbox/docker/vol
+**/terraform/**/.*
+
+.vscode/* 

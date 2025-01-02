@@ -24,7 +24,7 @@ type ISimulationHandler interface {
 	FindByIdSetup(w http.ResponseWriter, r *http.Request)
 	FindByIdBorrower(w http.ResponseWriter, r *http.Request)
 	UpdateSetup(w http.ResponseWriter, r *http.Request)
-	UpdateSimulationStatus(w http.ResponseWriter, r *http.Request)
+	UpdateSimulation(w http.ResponseWriter, r *http.Request)
 	BorrowerResponseToSimulation(w http.ResponseWriter, r *http.Request)
 	GenerateJWTw(w http.ResponseWriter, r *http.Request)
 	HealthCheckHandler(w http.ResponseWriter, r *http.Request)
@@ -523,8 +523,7 @@ func (s *SimulationHandler) FindByIdSimulation(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
-	utils.SuccessResponse(w, http.StatusCreated, dto.SimulationResponse{
+	utils.SuccessResponse(w, http.StatusOK, dto.SimulationResponse{
 		SimulationId:         simu.SimulationId,
 		InterestRate:         simu.InterestRate,
 		CreatedAt:            simu.CreatedAt,
@@ -570,6 +569,35 @@ func (s *SimulationHandler) UpdateSetup(w http.ResponseWriter, r *http.Request) 
 		utils.ErrorResponse(w, errors.Unauthorizedf("Unauthorized error: %v", err))
 		return
 	}
+
+	newSetup := &dto.SetupRequest{}
+
+	err = json.NewDecoder(r.Body).Decode(&newSetup)
+	if err != nil {
+		//logar error
+		utils.ErrorResponse(w, errors.UnprocessableEntityf("unprocessable entity error: %v", err))
+		return
+	}
+	error := utils.ValidateStruct(&newSetup)
+	if error != nil {
+		//logar error
+		utils.ErrorResponse(w, errors.BadRequestf("bad request error: %v", err))
+		return
+	}
+	err = s.service.UpdateSetup(&model.Setup{
+		Capital:      newSetup.Capital,
+		Fees:         newSetup.Fees,
+		InterestRate: newSetup.InterestRate,
+		Escope:       newSetup.Escope,
+	})
+	if err != nil {
+
+		utils.ErrorResponse(w, errors.Internalf("error to parser query params: %v", err))
+		return
+	}
+
+	utils.SuccessResponse(w, http.StatusOK, nil)
+
 }
 
 // @Summary Update Simulation Status
@@ -580,7 +608,7 @@ func (s *SimulationHandler) UpdateSetup(w http.ResponseWriter, r *http.Request) 
 // @Success 200
 // @Router /v1/simulation [PUT]
 // UpdateSimulationStatus implements ISimulationHandler.
-func (s *SimulationHandler) UpdateSimulationStatus(w http.ResponseWriter, r *http.Request) {
+func (s *SimulationHandler) UpdateSimulation(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
 	ctx = context.WithValue(ctx, "generatJWT", r.Header.Get("X-User"))
 	user := r.Header.Get("X-User")
@@ -606,6 +634,45 @@ func (s *SimulationHandler) UpdateSimulationStatus(w http.ResponseWriter, r *htt
 		utils.ErrorResponse(w, errors.Unauthorizedf("Unauthorized error: %v", err))
 		return
 	}
+
+	newSimu := &dto.SimulationRequest{}
+
+	err = json.NewDecoder(r.Body).Decode(&newSimu)
+	if err != nil {
+		//logar error
+		utils.ErrorResponse(w, errors.UnprocessableEntityf("unprocessable entity error: %v", err))
+		return
+	}
+	error := utils.ValidateStruct(&newSimu)
+	if error != nil {
+		//logar error
+		utils.ErrorResponse(w, errors.BadRequestf("bad request error: %v", err))
+		return
+	}
+	vars := mux.Vars(r)
+	id, ok := vars["id"]
+	if !ok {
+
+		utils.ErrorResponse(w, errors.BadRequestf("error to parser query params: %v", err))
+		return
+	}
+
+	err = s.service.UpdateSimulation(&model.Simulation{
+		SimulationId: id,
+		BorrowerId: newSimu.BorrowerId,
+		LoanValue: newSimu.LoanValue,
+		NumberOfInstallments: newSimu.NumberOfInstallments,
+		InterestRate: newSimu.InterestRate,
+
+	})
+	if err != nil {
+
+		utils.ErrorResponse(w, errors.Internalf("error to parser query params: %v", err))
+		return
+	}
+
+	utils.SuccessResponse(w, http.StatusOK, nil)
+
 }
 
 // @Summary Borrower Response To Simulation
@@ -650,7 +717,7 @@ func (s *SimulationHandler) BorrowerResponseToSimulation(w http.ResponseWriter, 
 		utils.ErrorResponse(w, errors.UnprocessableEntityf("unprocessable entity error: %v", err))
 		return
 	}
-	if request.Status != "acepted" && request.Status != "rejected" {
+	if request.Status != "accepted" && request.Status != "rejected" {
 
 		utils.ErrorResponse(w, errors.UnprocessableEntityf("unprocessable entity error: %v", err))
 		return

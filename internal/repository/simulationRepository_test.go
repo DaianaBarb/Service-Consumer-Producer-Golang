@@ -108,8 +108,7 @@ func TestRepository_UpdateSimulationStatus(t *testing.T) {
 		logger logger.ILogCloudWatch
 	}
 	type args struct {
-		simulationId string
-		status       string
+		simu *entity.Simulation
 	}
 	tests := []struct {
 		name    string
@@ -125,7 +124,7 @@ func TestRepository_UpdateSimulationStatus(t *testing.T) {
 				db:     tt.fields.db,
 				logger: tt.fields.logger,
 			}
-			if err := r.UpdateSimulationStatus(tt.args.simulationId, tt.args.status); (err != nil) != tt.wantErr {
+			if err := r.UpdateSimulation(tt.args.simu); (err != nil) != tt.wantErr {
 				t.Errorf("Repository.UpdateSimulationStatus() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

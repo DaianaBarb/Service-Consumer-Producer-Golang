@@ -251,7 +251,7 @@ func TestSimulationHandler_UpdateSimulationStatus(t *testing.T) {
 			s := &SimulationHandler{
 				service: tt.fields.service,
 			}
-			s.UpdateSimulationStatus(tt.args.w, tt.args.r)
+			s.UpdateSimulation(tt.args.w, tt.args.r)
 		})
 	}
 }

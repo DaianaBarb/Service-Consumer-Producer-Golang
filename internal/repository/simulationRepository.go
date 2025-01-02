@@ -21,7 +21,7 @@ type IRepository interface {
 	FindByIdSetup(setupId string) (*entity.Setup, error)
 	FindByIdBorrower(borrwerId string) (*entity.Borrower, error)
 	UpdateSetup(setupId string, newSetup *entity.Setup) error
-	UpdateSimulationStatus(simulationId string, status string) error
+	UpdateSimulation(simu *entity.Simulation) error
 	GetSimulations(param *model.Params) ([]entity.Simulation, error)
 	Ping() error
 }
@@ -115,14 +115,15 @@ func (r *Repository) CreatedSetup(set *entity.Setup) error {
 
 }
 
-func (r *Repository) UpdateSimulationStatus(simulationId string, status string) error {
+func (r *Repository) UpdateSimulation(simu *entity.Simulation) error {
+
 	query := `
 		UPDATE simulations 
-		SET status = $1, updated_at = NOW() 
-		WHERE id = $2
+		SET status = $1, borrower_id = $2, loan_value = $3, number_installments = $4, interest_rate = $5, updated_at = NOW() 
+		WHERE id = $6
 	`
 
-	_, err := r.db.Exec(query, status, simulationId)
+	_, err := r.db.Exec(query, simu.Status, simu.BorrowerId, simu.LoanValue, simu.NumberOfInstallments, simu.InterestRate, simu.SimulationId)
 	return err
 }
 

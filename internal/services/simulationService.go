@@ -30,8 +30,8 @@ type ISimulationService interface {
 	FindByIdSimulation(simulationId string) (*model.Simulation, error)
 	FindByIdSetup(setupId string) (*model.Setup, error)
 	FindByIdBorrower(borrwerId string) (*model.Borrower, error)
-	UpdateSetup(setupId string, newSetup *model.Setup) error
-	UpdateSimulationStatus(simulationId string, status string) error
+	UpdateSetup(newSetup *model.Setup) error
+	UpdateSimulation(*model.Simulation) error
 	SimulationResponseBorrower(response *model.SimulationResponseBorrower) error
 	GenerateJWT(payload model.PayloadJWT) (string, error)
 	TokenIsValid(tokenString string) (*jwt.Token, error)
@@ -59,9 +59,12 @@ func NewSimulationService(repo repository.IRepository, sqs sqsAws.Client, anti a
 
 // SimulationResponseBorrower implements ISimulationService.
 func (s *SimulationService) SimulationResponseBorrower(response *model.SimulationResponseBorrower) error {
+
+	newSimu := &entity.Simulation{SimulationId: response.SimulationId,
+		Status: response.Status}
 	// persistir no banco o status e enviar pra fila
 
-	err := s.repository.UpdateSimulationStatus(response.SimulationId, response.Status)
+	err := s.repository.UpdateSimulation(newSimu)
 	if err != nil {
 		return err
 	}
@@ -179,14 +182,29 @@ func (s *SimulationService) FindByIdSimulation(simulationId string) (*model.Simu
 }
 
 // UpdateSetup implements ISimulationService.
-func (s *SimulationService) UpdateSetup(setupId string, newSetup *model.Setup) error {
+func (s *SimulationService) UpdateSetup(newSetup *model.Setup) error {
 
-	return s.repository.UpdateSetup(setupId, model.ToSetupEntity(newSetup))
+	escope, err := s.theScopeIsValid(newSetup.Escope)
+	if err != nil {
+		return err
+	}
+	if escope {
+		return s.repository.UpdateSetup(os.ExpandEnv("SETUP_ID"), model.ToSetupEntity(newSetup))
+
+	}
+	return errors.New("escopo invalido")
+
 }
 
 // UpdateSimulationStatus implements ISimulationService.
-func (s *SimulationService) UpdateSimulationStatus(simulationId string, status string) error {
-	return s.repository.UpdateSimulationStatus(simulationId, status)
+func (s *SimulationService) UpdateSimulation(m *model.Simulation) error {
+	simu := &entity.Simulation{SimulationId: m.SimulationId,
+		Status:               m.Status,
+		BorrowerId:           m.BorrowerId,
+		LoanValue:            m.LoanValue,
+		NumberOfInstallments: m.NumberOfInstallments,
+		InterestRate:         m.InterestRate}
+	return s.repository.UpdateSimulation(simu)
 }
 
 func (s *SimulationService) checkAntiFraude(request *dto.AntiFraudRequest) (*dto.AntiFraudResponse, error) {
@@ -320,4 +338,8 @@ func (s *SimulationService) Ping() error {
 		return err
 	}
 	return nil
+}
+
+func (s *SimulationService) theScopeIsValid(escope string) (bool, error) {
+	return true, nil
 }

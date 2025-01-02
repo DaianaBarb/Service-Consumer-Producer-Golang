@@ -1,0 +1,37 @@
+run:
+  deadline: 120s
+  skip-dirs:
+    - internal/api/rest/mocks
+    - internal/services/mocks
+    - internal/repository/mocks
+    - internal/api/handlres/mocks
+  skip-files:
+    - mock.go
+    - _test.go
+    - _var.go
+    - routes.go
+    
+
+linters: 
+  disable-all: true
+  enable:
+    - gofmt
+    - goconst
+    - gocyclo
+    - goimports
+    - varcheck
+    - errcheck
+    - gosec
+    - unused
+         
+linters-settings:
+  goling: 
+    min-confidence: 0.9
+  lll:
+    line-length: 140
+  misspell:
+    ignore-words:
+  gocyclo:
+    min-complexity: 20
+
+    go: '1.21'

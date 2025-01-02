@@ -257,7 +257,7 @@ func TestSimulationService_UpdateSetup(t *testing.T) {
 				repository: tt.fields.repository,
 				sqsClient:  tt.fields.sqsClient,
 			}
-			if err := s.UpdateSetup(tt.args.setupId, tt.args.newSetup); (err != nil) != tt.wantErr {
+			if err := s.UpdateSetup(tt.args.newSetup); (err != nil) != tt.wantErr {
 				t.Errorf("SimulationService.UpdateSetup() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -270,8 +270,7 @@ func TestSimulationService_UpdateSimulationStatus(t *testing.T) {
 		sqsClient  sqsAws.Client
 	}
 	type args struct {
-		simulationId string
-		status       string
+		simu *model.Simulation
 	}
 	tests := []struct {
 		name    string
@@ -287,7 +286,7 @@ func TestSimulationService_UpdateSimulationStatus(t *testing.T) {
 				repository: tt.fields.repository,
 				sqsClient:  tt.fields.sqsClient,
 			}
-			if err := s.UpdateSimulationStatus(tt.args.simulationId, tt.args.status); (err != nil) != tt.wantErr {
+			if err := s.UpdateSimulation(tt.args.simu); (err != nil) != tt.wantErr {
 				t.Errorf("SimulationService.UpdateSimulationStatus() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

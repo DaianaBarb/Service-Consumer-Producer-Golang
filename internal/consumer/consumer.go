@@ -15,7 +15,7 @@ import (
 	"project-golang/internal/domain/model"
 	service "project-golang/internal/services"
 
-	"github.com/americanas-go/config"
+	//"github.com/americanas-go/config"
 	"github.com/americanas-go/log"
 	"github.com/aws/aws-sdk-go-v2/service/sqs/types"
 )
@@ -108,8 +108,8 @@ func (w *worker) processMessage(message types.Message, ctx context.Context) {
 func NewSqs(sqsClient sqsAws.Client, service service.Processor) Consumer {
 	return &worker{
 		queueUrl:          os.Getenv("QUEUE_URL"),
-		visibilityTimeout: int32(config.Int(os.Getenv("TIMEOUTPATH"))),
-		sleepTimeout:      config.Duration(os.Getenv("SLEEPTIMEOUT")) * time.Millisecond,
+	//	visibilityTimeout: int32(config.Int(os.Getenv("TIMEOUTPATH"))),
+	//	sleepTimeout:      config.Duration(os.Getenv("SLEEPTIMEOUT")) * time.Millisecond,
 		client:            sqsClient,
 		service:         service,
 	}

@@ -10,3 +10,11 @@ clean:
 
 lint:
 	golangci-lint run ./... --config ./build/golangci-lint/config.yml
+
+
+gofmt:
+	gofmt -w -s .
+
+nos-standard:
+	gofmt -l -s .
+

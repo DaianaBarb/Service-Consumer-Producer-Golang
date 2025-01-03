@@ -24,18 +24,11 @@ type Consumer interface {
 	Do()
 }
 
-const (
-	root         = "worker.sqs"
-	urlPath      = ".url"
-	timeoutPath  = ".visibilityTimeout"
-	sleepTimeout = ".sleepTimeout"
-)
-
 type worker struct {
 	queueUrl          string
 	visibilityTimeout int32
 	sleepTimeout      time.Duration
-	service         service.Processor
+	service           service.Processor
 	client            sqsAws.Client
 }
 
@@ -107,11 +100,11 @@ func (w *worker) processMessage(message types.Message, ctx context.Context) {
 
 func NewSqs(sqsClient sqsAws.Client, service service.Processor) Consumer {
 	return &worker{
-		queueUrl:          os.Getenv("QUEUE_URL"),
-	//	visibilityTimeout: int32(config.Int(os.Getenv("TIMEOUTPATH"))),
-	//	sleepTimeout:      config.Duration(os.Getenv("SLEEPTIMEOUT")) * time.Millisecond,
-		client:            sqsClient,
-		service:         service,
+		queueUrl: os.Getenv("QUEUE_URL"),
+		//	visibilityTimeout: int32(config.Int(os.Getenv("TIMEOUTPATH"))),
+		//	sleepTimeout:      config.Duration(os.Getenv("SLEEPTIMEOUT")) * time.Millisecond,
+		client:  sqsClient,
+		service: service,
 	}
 
 }

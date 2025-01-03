@@ -3,6 +3,7 @@ package routes
 import (
 	"fmt"
 	"project-golang/internal/api/rest/handlres"
+	"time"
 
 	"net/http"
 
@@ -35,11 +36,24 @@ func (s *Routes) RegisterRoutes() {
 	c.HandleFunc("/helth/db", s.handlerSimulation.HealthCheckHandler).Methods("GET")
 	c.HandleFunc("/health/app", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"status":"UP"}`))
+		_, err := w.Write([]byte(`{"status":"UP"}`))
+		if err != nil {
+			fmt.Println("error %v", err)
+		}
 	}).Methods("GET")
 
 	fmt.Println(" online na porta 8080")
-	http.ListenAndServe(":8080", c)
+	srv := &http.Server{
+		Addr:         ":8080",
+		Handler:      c,
+		ReadTimeout:  10 * time.Second, // Tempo máximo para leitura do corpo da requisição
+		WriteTimeout: 10 * time.Second, // Tempo máximo para escrever a resposta
+		IdleTimeout:  15 * time.Second, // Tempo máximo para conexões ociosas
+	}
+	err := srv.ListenAndServe()
+	if err != nil {
+		fmt.Printf("error %v", err)
+	}
 }
 
 type Routes struct {

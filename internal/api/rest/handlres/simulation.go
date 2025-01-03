@@ -772,7 +772,10 @@ func (s *SimulationHandler) HealthCheckHandler(w http.ResponseWriter, r *http.Re
 	err := s.service.Ping()
 	if err != nil {
 
-		w.Write([]byte(fmt.Sprintf(`{"status": "DOWN", "error": "%v"}`, err)))
+		_, err = w.Write([]byte(fmt.Sprintf(`{"status": "DOWN", "error": "%v"}`, err)))
+		if err != nil {
+			fmt.Println("error %v", err)
+		}
 		return
 	}
 

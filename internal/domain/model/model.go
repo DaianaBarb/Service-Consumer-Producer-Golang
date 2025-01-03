@@ -47,13 +47,13 @@ type Setup struct {
 	UpdatedAt     *time.Time
 }
 
-type Contract struct {
-	ContractId   string
-	SimulationId string
-	CreatedAt    *time.Time
-	Status       string
-	terms        string
-}
+// type Contract struct {
+// 	ContractId   string
+// 	SimulationId string
+// 	CreatedAt    *time.Time
+// 	Status       string
+// 	terms        string
+// }
 
 type SimulationResponseBorrower struct {
 	SimulationId string
@@ -144,7 +144,8 @@ func ToBorrowerEntity(bo *Borrower) *entity.Borrower {
 	}
 
 }
-type SimulationParam struct{
+
+type SimulationParam struct {
 	SimulationId         *string
 	BorrowerId           *string
 	LoanValue            *float64 // valor emprestimo

@@ -13,7 +13,7 @@ func NewConfig() aws.Config {
 
 	//#################### para testar local #####################
 	cfg, err := config.LoadDefaultConfig(context.Background(),
-	config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider("test", "test", "")),
+		config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider("test", "test", "")),
 		config.WithEndpointResolverWithOptions(aws.EndpointResolverWithOptionsFunc(func(service,
 			region string, options ...interface{}) (aws.Endpoint, error) {
 

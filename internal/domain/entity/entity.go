@@ -36,10 +36,10 @@ type Setup struct {
 	UpdatedAt     *time.Time
 }
 
-type Contract struct {
-	ContractId   string
-	SimulationId string
-	CreatedAt    *time.Time
-	Status       string
-	terms        string
-}
+// type Contract struct {
+// 	ContractId   string
+// 	SimulationId string
+// 	CreatedAt    *time.Time
+// 	Status       string
+// 	terms        string
+// }

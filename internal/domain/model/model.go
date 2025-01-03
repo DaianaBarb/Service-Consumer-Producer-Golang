@@ -20,12 +20,6 @@ type Simulation struct {
 	InterestRate         float64
 }
 
-type LogEntry struct {
-	Level     string `json:"level"`
-	Message   string `json:"message"`
-	Timestamp string `json:"timestamp"`
-}
-
 type Borrower struct {
 	BorrowerId string
 	Name       string
@@ -45,6 +39,11 @@ type Setup struct {
 	EscopeIsValid bool
 	CreatedAt     *time.Time
 	UpdatedAt     *time.Time
+}
+type LogEntry struct {
+	Level     string `json:"level"`
+	Message   string `json:"message"`
+	Timestamp string `json:"timestamp"`
 }
 
 // type Contract struct {

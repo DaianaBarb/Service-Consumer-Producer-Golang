@@ -10,6 +10,7 @@ import (
 	service "project-golang/internal/services"
 	"project-golang/internal/utils"
 	"project-golang/internal/utils/errors"
+	"strconv"
 	"strings"
 	"time"
 
@@ -77,7 +78,69 @@ func NewSimulationHandler(serv service.ISimulationService) ISimulationHandler {
 // @Router /v1/simulation [GET]
 // FindSimulationsByParam implements ISimulationHandler.
 func (s *SimulationHandler) FindSimulationsByParam(w http.ResponseWriter, r *http.Request) {
-	panic("unimplemented")
+	ctx := context.Background()
+	ctx = context.WithValue(ctx, "generatJWT", r.Header.Get("X-User"))
+	user := r.Header.Get("X-User")
+	w.Header().Set("Content-Type", "application/json")
+
+	if len(user) == 0 || user == "" {
+
+		// fazer log user invalid
+		utils.ErrorResponse(w, errors.BadRequestf("header X-User not exists"))
+		return
+	}
+
+	token, err := extractToken(r)
+	if err != nil {
+
+		utils.ErrorResponse(w, errors.Unauthorizedf("Unauthorized error: %v", err))
+		return
+	}
+	tokenJwt, err := s.service.TokenIsValid(token)
+
+	if err != nil && tokenJwt == nil {
+
+		utils.ErrorResponse(w, errors.Unauthorizedf("Unauthorized error: %v", err))
+		return
+	}
+
+	layout := "2006-01-02T15:04:05"
+
+	updatedAt, _ := time.Parse(layout, r.URL.Query().Get("updatedAt"))
+
+	createdAt, _ := time.Parse(layout, r.URL.Query().Get("createdAt"))
+
+	simulationId := r.URL.Query().Get("simulationId")
+	borrowerId := r.URL.Query().Get("borrowerId ")
+	loanValue, _ := strconv.ParseFloat(r.URL.Query().Get("loanValue"), 64)
+	numberOfInstallments, _ := strconv.ParseFloat(r.URL.Query().Get("numberOfInstallments"), 64)
+
+	status := r.URL.Query().Get("status")
+	interestRate, _ := strconv.ParseFloat(r.URL.Query().Get("interestRate"), 64)
+	page, _ := strconv.Atoi(r.URL.Query().Get("page"))
+	pageSize, _ := strconv.Atoi(r.URL.Query().Get("pageSize"))
+
+	simulations, err := s.service.FindByParamSimulations(&model.Params{
+		Simu: &model.SimulationParam{
+			SimulationId:         &simulationId,
+			BorrowerId:           &borrowerId,
+			LoanValue:            &loanValue,
+			NumberOfInstallments: &numberOfInstallments,
+			Status:               &status,
+			InterestRate:         &interestRate,
+			CreatedAt:            &createdAt,
+			UpdatedAt:            &updatedAt,
+		},
+		Page:     page,
+		PageSize: pageSize,
+	})
+	if err != nil {
+		utils.ErrorResponse(w, errors.Internalf("request error: %v", err))
+		return
+	}
+
+	utils.SuccessResponse(w, http.StatusOK, simulations)
+
 }
 
 // @Summary GenerateJWTw

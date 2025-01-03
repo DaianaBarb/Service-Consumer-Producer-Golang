@@ -44,3 +44,5 @@ A cobrança do SaaS para o credor será realizada por quan dade de requisições
 o Tempo de resposta menor do que um segundo: 100% do valor;
 o Tempo de resposta de até dois segundos: 70% do valor;
 o Tempo de resposta maior do que dois segundos: 50% do valor.
+
+![alt text](<new-diagrama-simulation (1).jpg>)

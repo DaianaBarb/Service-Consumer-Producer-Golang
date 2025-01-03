@@ -362,7 +362,7 @@ func (s *SimulationHandler) FindByIdBorrower(w http.ResponseWriter, r *http.Requ
 	id, ok := vars["id"]
 	if !ok {
 
-		utils.ErrorResponse(w, errors.BadRequestf("error to parser query params: %v", err))
+		utils.ErrorResponse(w, errors.BadRequestf("error to parser query params: %v", id))
 		return
 	}
 
@@ -438,7 +438,7 @@ func (s *SimulationHandler) FindByIdSetup(w http.ResponseWriter, r *http.Request
 	id, ok := vars["id"]
 	if !ok {
 
-		utils.ErrorResponse(w, errors.BadRequestf("error to parser query params: %v", err))
+		utils.ErrorResponse(w, errors.BadRequestf("error to parser query params: %v", id))
 		return
 	}
 
@@ -497,7 +497,7 @@ func (s *SimulationHandler) FindByIdSimulation(w http.ResponseWriter, r *http.Re
 	token, err := extractToken(r)
 	if err != nil {
 
-		utils.ErrorResponse(w, errors.Unauthorizedf("Unauthorized error: %v", err))
+		utils.ErrorResponse(w, errors.Unauthorizedf("Unauthorized error: %v", token))
 		return
 	}
 	tokenJwt, err := s.service.TokenIsValid(token)
@@ -512,7 +512,7 @@ func (s *SimulationHandler) FindByIdSimulation(w http.ResponseWriter, r *http.Re
 	id, ok := vars["id"]
 	if !ok {
 
-		utils.ErrorResponse(w, errors.BadRequestf("error to parser query params: %v", err))
+		utils.ErrorResponse(w, errors.BadRequestf("error to parser query params: %v", id))
 		return
 	}
 
@@ -606,7 +606,7 @@ func (s *SimulationHandler) UpdateSetup(w http.ResponseWriter, r *http.Request) 
 // @Accept  json
 // @Produce  json
 // @Success 200
-// @Router /v1/simulation [PUT]
+// @Router /v1/simulation/{id} [PUT]
 // UpdateSimulationStatus implements ISimulationHandler.
 func (s *SimulationHandler) UpdateSimulation(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
@@ -620,7 +620,13 @@ func (s *SimulationHandler) UpdateSimulation(w http.ResponseWriter, r *http.Requ
 		utils.ErrorResponse(w, errors.BadRequestf("header X-User not exists"))
 		return
 	}
+	vars := mux.Vars(r)
+	id, ok := vars["id"]
+	if !ok {
 
+		utils.ErrorResponse(w, errors.BadRequestf("error to parser query params: %v", id))
+		return
+	}
 	token, err := extractToken(r)
 	if err != nil {
 
@@ -649,21 +655,20 @@ func (s *SimulationHandler) UpdateSimulation(w http.ResponseWriter, r *http.Requ
 		utils.ErrorResponse(w, errors.BadRequestf("bad request error: %v", err))
 		return
 	}
-	vars := mux.Vars(r)
-	id, ok := vars["id"]
+	vars = mux.Vars(r)
+	id, ok = vars["id"]
 	if !ok {
 
-		utils.ErrorResponse(w, errors.BadRequestf("error to parser query params: %v", err))
+		utils.ErrorResponse(w, errors.BadRequestf("error to parser query params: %v", id))
 		return
 	}
 
 	err = s.service.UpdateSimulation(&model.Simulation{
-		SimulationId: id,
-		BorrowerId: newSimu.BorrowerId,
-		LoanValue: newSimu.LoanValue,
+		SimulationId:         id,
+		BorrowerId:           newSimu.BorrowerId,
+		LoanValue:            newSimu.LoanValue,
 		NumberOfInstallments: newSimu.NumberOfInstallments,
-		InterestRate: newSimu.InterestRate,
-
+		InterestRate:         newSimu.InterestRate,
 	})
 	if err != nil {
 
@@ -681,7 +686,7 @@ func (s *SimulationHandler) UpdateSimulation(w http.ResponseWriter, r *http.Requ
 // @Accept  json
 // @Produce  json
 // @Success 200
-// @Router /v1/simulation/borrower [POST]
+// @Router /v1/simulation/{id} [PATCH]
 func (s *SimulationHandler) BorrowerResponseToSimulation(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
 	ctx = context.WithValue(ctx, "generatJWT", r.Header.Get("X-User"))
@@ -692,6 +697,13 @@ func (s *SimulationHandler) BorrowerResponseToSimulation(w http.ResponseWriter, 
 
 		// fazer log user invalid
 		utils.ErrorResponse(w, errors.BadRequestf("header X-User not exists"))
+		return
+	}
+	vars := mux.Vars(r)
+	id, ok := vars["id"]
+	if !ok {
+
+		utils.ErrorResponse(w, errors.BadRequestf("error to parser query params: %v", id))
 		return
 	}
 
@@ -731,7 +743,7 @@ func (s *SimulationHandler) BorrowerResponseToSimulation(w http.ResponseWriter, 
 		return
 	}
 
-	err = s.service.SimulationResponseBorrower(&model.SimulationResponseBorrower{SimulationId: request.SimulationId,
+	err = s.service.SimulationResponseBorrower(id, &model.SimulationResponseBorrower{
 		Status: request.Status})
 
 	if err != nil {

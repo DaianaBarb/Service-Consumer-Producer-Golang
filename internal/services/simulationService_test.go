@@ -17,6 +17,7 @@ func TestSimulationService_SimulationResponseBorrower(t *testing.T) {
 		sqsClient  sqsAws.Client
 	}
 	type args struct {
+		id       string
 		response *model.SimulationResponseBorrower
 	}
 	tests := []struct {
@@ -33,7 +34,7 @@ func TestSimulationService_SimulationResponseBorrower(t *testing.T) {
 				repository: tt.fields.repository,
 				sqsClient:  tt.fields.sqsClient,
 			}
-			if err := s.SimulationResponseBorrower(tt.args.response); (err != nil) != tt.wantErr {
+			if err := s.SimulationResponseBorrower(tt.args.id, tt.args.response); (err != nil) != tt.wantErr {
 				t.Errorf("SimulationService.SimulationResponseBorrower() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

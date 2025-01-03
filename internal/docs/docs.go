@@ -134,24 +134,6 @@ const docTemplate = `{
                     }
                 }
             },
-            "put": {
-                "description": "Update Simulation Status",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "simulation"
-                ],
-                "summary": "Update Simulation Status",
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                }
-            },
             "post": {
                 "description": "cCreated Simulation",
                 "consumes": [
@@ -171,8 +153,29 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/simulation/borrower": {
-            "post": {
+        "/v1/simulation/{id}": {
+            "get": {
+                "responses": {}
+            },
+            "put": {
+                "description": "Update Simulation Status",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "simulation"
+                ],
+                "summary": "Update Simulation Status",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            },
+            "patch": {
                 "description": "borrower's response to the loan simulation",
                 "consumes": [
                     "application/json"
@@ -189,11 +192,6 @@ const docTemplate = `{
                         "description": "OK"
                     }
                 }
-            }
-        },
-        "/v1/simulation/{id}": {
-            "get": {
-                "responses": {}
             }
         }
     },

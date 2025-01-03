@@ -32,7 +32,7 @@ type ISimulationService interface {
 	FindByIdBorrower(borrwerId string) (*model.Borrower, error)
 	UpdateSetup(newSetup *model.Setup) error
 	UpdateSimulation(*model.Simulation) error
-	SimulationResponseBorrower(response *model.SimulationResponseBorrower) error
+	SimulationResponseBorrower(id string, response *model.SimulationResponseBorrower) error
 	GenerateJWT(payload model.PayloadJWT) (string, error)
 	TokenIsValid(tokenString string) (*jwt.Token, error)
 	FindByParamSimulations(param *model.Params) (dto.SimulationPaginationResponse, error)
@@ -58,7 +58,7 @@ func NewSimulationService(repo repository.IRepository, sqs sqsAws.Client, anti a
 }
 
 // SimulationResponseBorrower implements ISimulationService.
-func (s *SimulationService) SimulationResponseBorrower(response *model.SimulationResponseBorrower) error {
+func (s *SimulationService) SimulationResponseBorrower(id string, response *model.SimulationResponseBorrower) error {
 
 	newSimu := &entity.Simulation{SimulationId: response.SimulationId,
 		Status: response.Status}

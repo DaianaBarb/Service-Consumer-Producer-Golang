@@ -168,6 +168,21 @@ paths:
       summary: Created Simulation
       tags:
       - Setup
+  /v1/simulation/{id}:
+    get:
+      responses: {}
+    patch:
+      consumes:
+      - application/json
+      description: borrower's response to the loan simulation
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Borrower Response To Simulation
+      tags:
+      - simulation
     put:
       consumes:
       - application/json
@@ -178,22 +193,6 @@ paths:
         "200":
           description: OK
       summary: Update Simulation Status
-      tags:
-      - simulation
-  /v1/simulation/{id}:
-    get:
-      responses: {}
-  /v1/simulation/borrower:
-    post:
-      consumes:
-      - application/json
-      description: borrower's response to the loan simulation
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-      summary: Borrower Response To Simulation
       tags:
       - simulation
 swagger: "2.0"

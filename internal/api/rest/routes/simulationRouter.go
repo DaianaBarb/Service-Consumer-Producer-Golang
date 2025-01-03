@@ -29,8 +29,8 @@ func (s *Routes) RegisterRoutes() {
 	c.HandleFunc("/v1/borrower/{id}", s.handlerSimulation.FindByIdBorrower).Methods("GET")
 	c.PathPrefix("/swagger/").Handler(http.StripPrefix("/swagger/", http.FileServer(http.Dir("./swagger/"))))
 	c.HandleFunc("/v1/setup", s.handlerSimulation.UpdateSetup).Methods("PUT")
-	c.HandleFunc("/v1/simulation", s.handlerSimulation.UpdateSimulation).Methods("PUT")
-	c.HandleFunc("/v1/simulation/borrower", s.handlerSimulation.BorrowerResponseToSimulation).Methods("POST")
+	c.HandleFunc("/v1/simulation/{id}", s.handlerSimulation.UpdateSimulation).Methods("PUT")
+	c.HandleFunc("/v1/simulation/borrower/{id}", s.handlerSimulation.BorrowerResponseToSimulation).Methods("PATCH")
 	c.HandleFunc("/v1/simulation", s.handlerSimulation.FindSimulationsByParam).Methods("GET").Queries()
 	c.HandleFunc("/helth/db", s.handlerSimulation.HealthCheckHandler).Methods("GET")
 	c.HandleFunc("/health/app", func(w http.ResponseWriter, r *http.Request) {

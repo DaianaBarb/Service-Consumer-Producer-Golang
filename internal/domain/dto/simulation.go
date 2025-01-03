@@ -87,7 +87,6 @@ type BorrowerResponse struct {
 }
 
 type BorrowerResponseTosimulationRequest struct {
-	SimulationId string `json:"simulationId"`
 	Status       string `json:"status"`
 }
 

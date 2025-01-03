@@ -1,6 +1,9 @@
 !/bin/bash
 
 # Configurações do banco de dados
+# deveriam estar em um cofre de senha para a segurança, os dados nao podem ser expostos, porem como e so um case tecnico eu deixei assim
+# caso tenha algum dado de cartao na tabela ou conta estes dados sigilosos  devem ser criptografados
+#  sempre garantido a segurança !!
 DB_NAME="simulations"           # Nome do banco de dados
 DB_USER="postgres"         # Usuário do banco
 DB_PASSWORD="12345"       # Senha do banco

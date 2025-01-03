@@ -1,6 +1,8 @@
 package aws
 
 import (
+	"database/sql"
+	"fmt"
 	"project-golang/internal/adapters/cloud/aws"
 	"project-golang/internal/adapters/cloud/aws/sqs"
 	"project-golang/internal/adapters/db/postegres"
@@ -31,7 +33,18 @@ func NewModuleAtributesRepository() fx.Option {
 		fx.Provide(postegres.Connect),
 		fx.Provide(logger.NewCloudWatch),
 		fx.Provide(apiantifraude.NewApiAntifraude),
+		
 	)
+}
+
+func CloseDB() fx.Annotation {
+	return fx.OnStop(func(db *sql.DB) {
+		// Aqui estamos dizendo ao Uber FX para fechar a conexão ao banco quando a aplicação for finalizada.
+		fmt.Println("Fechando a conexão com o banco de dados...")
+		if err := db.Close(); err != nil {
+			fmt.Println("Erro ao fechar a conexão:", err)
+		}
+	})
 }
 
 func ModuleServiceSimulation() fx.Option {

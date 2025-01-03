@@ -41,7 +41,7 @@ func (r *Repository) Ping() error {
 }
 
 func NewRepository(db *sql.DB, log logger.ILogCloudWatch) IRepository {
-
+	
 	return &Repository{
 		db:     db,
 		logger: log,

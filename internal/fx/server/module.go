@@ -16,8 +16,14 @@ func Start() {
 		modules.NewModuleConsumer(),
 		modules.ModuleRouterSimulation(),
 	)
+
 	fx.New(
 		module,
+		fx.Provide(
+			fx.Annotate(
+				modules.CloseDB,
+			),
+		),
 		fx.Invoke(
 			func(job worker.Consumer, job2 routes.IRoutes) {
 				job2.RegisterRoutes()

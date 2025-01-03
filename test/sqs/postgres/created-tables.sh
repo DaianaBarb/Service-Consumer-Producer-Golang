@@ -1,9 +1,9 @@
 !/bin/bash
 
 # Configurações do banco de dados
-DB_NAME="seu_banco"           # Nome do banco de dados
-DB_USER="seu_usuario"         # Usuário do banco
-DB_PASSWORD="sua_senha"       # Senha do banco
+DB_NAME="simulations"           # Nome do banco de dados
+DB_USER="postgres"         # Usuário do banco
+DB_PASSWORD="12345"       # Senha do banco
 DB_HOST="localhost"           # Host do banco
 DB_PORT="5432"                # Porta do banco
 

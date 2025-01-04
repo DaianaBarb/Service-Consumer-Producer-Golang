@@ -18,8 +18,8 @@ echo "Criando tabelas no banco de dados $DB_NAME..."
 psql -h $DB_HOST -p $DB_PORT -U $DB_USER -d $DB_NAME <<EOSQL
 
 -- Criar tabela Borrower se não existir
-CREATE TABLE IF NOT EXISTS Borrower (
-    borrower_id UUID PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS Borrower  (
+    borrower_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(255) NOT NULL,
     phone VARCHAR(20),
     email VARCHAR(255) UNIQUE,
@@ -30,22 +30,22 @@ CREATE TABLE IF NOT EXISTS Borrower (
 
 -- Criar tabela Simulation se não existir
 CREATE TABLE IF NOT EXISTS Simulation (
-    simulation_id UUID PRIMARY KEY,
+    simulation_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     borrower_id UUID REFERENCES Borrower(borrower_id) ON DELETE CASCADE,
-    loan_value NUMERIC(15, 2) NOT NULL,
+    loan_value NUMERIC NOT NULL,
     number_of_installments INT NOT NULL,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW(),
     status VARCHAR(50) NOT NULL,
-    interest_rate NUMERIC(5, 2) NOT NULL
+    interest_rate NUMERIC NOT NULL
 );
 
 -- Criar tabela Setup se não existir
 CREATE TABLE IF NOT EXISTS Setup (
-    setup_id UUID PRIMARY KEY,
-    capital NUMERIC(15, 2) NOT NULL,
-    fees NUMERIC(5, 2) NOT NULL,
-    interest_rate NUMERIC(5, 2) NOT NULL,
+    setup_id VARCHAR PRIMARY KEY,
+    capital NUMERIC NOT NULL,
+    fees NUMERIC NOT NULL,
+    interest_rate NUMERIC NOT NULL,
     escope VARCHAR(255) NOT NULL,
     escope_is_valid BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT NOW(),

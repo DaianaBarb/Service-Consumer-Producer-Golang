@@ -19,8 +19,7 @@ type QueuePublishPayload struct {
 }
 
 type JwtRequest struct {
-	CredorId string `json:"credorId "`
-	Escopo   string `json:"escopoId "`
+	Escopo string `json:"escopo"`
 }
 
 type SimulationRequest struct {
@@ -63,8 +62,7 @@ type JwtResponse struct {
 
 func ToPayloadJWTModel(r JwtRequest) *model.PayloadJWT {
 	return &model.PayloadJWT{
-		CredorID: r.CredorId,
-		Escopo:   r.CredorId,
+		Escopo: r.Escopo,
 	}
 
 }

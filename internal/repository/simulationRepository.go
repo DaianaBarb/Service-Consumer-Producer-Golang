@@ -41,7 +41,7 @@ func (r *Repository) Ping() error {
 }
 
 func NewRepository(db *sql.DB, log logger.ILogCloudWatch) IRepository {
-	
+
 	return &Repository{
 		db:     db,
 		logger: log,
@@ -49,11 +49,11 @@ func NewRepository(db *sql.DB, log logger.ILogCloudWatch) IRepository {
 }
 
 func (r *Repository) CreatedSimulation(simu *entity.Simulation) (*entity.Simulation, error) {
-	simula := &entity.Simulation{}
+	simula := entity.Simulation{}
 
 	query := `
-		INSERT INTO simulations (borrower_id, loan_value, number_installments, interest_rate, status,created_at, updated_at)
-		VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
+		INSERT INTO simulation (borrower_id, loan_value, number_of_installments, interest_rate, status, created_at, updated_at)
+		VALUES ($1, $2, $3, $4, $5, NOW(), NOW()) RETURNING *;
 	`
 
 	// _, err := r.db.Exec(query, simu.BorrowerId, simu.LoanValue, simu.NumberOfInstallments, simu.InterestRate, simu.Status)
@@ -69,14 +69,17 @@ func (r *Repository) CreatedSimulation(simu *entity.Simulation) (*entity.Simulat
 		simu.InterestRate,
 		simu.Status,
 	).Scan(
-		simula.SimulationId,
-		simula.BorrowerId,
-		simula.LoanValue,
-		simula.NumberOfInstallments,
-		simula.InterestRate,
-		simula.Status,
-		simula.CreatedAt,
-		simula.UpdatedAt,
+		&simula.SimulationId,
+		&simula.BorrowerId,
+		&simula.LoanValue,
+		&simula.NumberOfInstallments,
+		&simula.CreatedAt,
+		&simula.UpdatedAt,
+		&simula.Status,
+		&simula.InterestRate,
+		
+		
+		
 	)
 
 	if err != nil {
@@ -100,13 +103,14 @@ func (r *Repository) CreatedBorrower(tom *entity.Borrower) error {
 	return nil
 }
 func (r *Repository) CreatedSetup(set *entity.Setup) error {
-
+	set.Escope = "escope"
+	set.EscopeIsValid = true
 	query := `
-	INSERT INTO setup ( setup_id, capital, fees, interest_rate,created_at, updated_at)
-	VALUES ($1, $2, $3,$4, NOW(), NOW())
+	INSERT INTO setup ( setup_id, capital, fees, interest_rate, escope, escope_is_valid, created_at, updated_at)
+	VALUES ($1, $2, $3,$4, $5, $6, NOW(), NOW())
 `
 
-	_, err := r.db.Exec(query, os.Getenv("SETUP_ID"), set.Capital, set.Fees, set.InterestRate)
+	_, err := r.db.Exec(query, os.Getenv("SETUP_ID"), set.Capital, set.Fees, set.InterestRate, set.Escope, set.EscopeIsValid)
 	if err != nil {
 		return err
 	}
@@ -178,22 +182,24 @@ func (r *Repository) FindByIdSetup(setupId string) (*entity.Setup, error) {
 		return config.(*entity.Setup), nil
 	}
 
-	setup := &entity.Setup{}
+	setup := entity.Setup{}
 
 	query := `
-	SELECT setup_id, capital, fees, interest_rate, created_at, updated_at
+	SELECT setup_id, capital, fees, interest_rate, escope, escope_is_valid, created_at, updated_at
 	FROM setup
-	WHERE id = $1
+	WHERE setup_id = $1
 `
 	row := r.db.QueryRow(query, setupId)
 
 	err := row.Scan(
-		setup.SetupId,
-		setup.Capital,
-		setup.Fees,
-		setup.InterestRate,
-		setup.CreatedAt,
-		setup.UpdatedAt,
+		&setup.SetupId,
+		&setup.Capital,
+		&setup.Fees,
+		&setup.InterestRate,
+		&setup.Escope,
+		&setup.EscopeIsValid,
+		&setup.CreatedAt,
+		&setup.UpdatedAt,
 	)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -204,7 +210,7 @@ func (r *Repository) FindByIdSetup(setupId string) (*entity.Setup, error) {
 		return nil, err
 	}
 
-	return setup, nil
+	return &setup, nil
 }
 func (r *Repository) FindByIdBorrower(borrwerId string) (*entity.Borrower, error) {
 

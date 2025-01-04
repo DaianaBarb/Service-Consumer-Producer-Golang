@@ -164,7 +164,7 @@ func (s *SimulationHandler) GenerateJWTw(w http.ResponseWriter, r *http.Request)
 		utils.ErrorResponse(w, errors.BadRequestf("header X-User not exists"))
 		return
 	}
-	request := &dto.JwtRequest{}
+	request := dto.JwtRequest{}
 
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
@@ -179,7 +179,7 @@ func (s *SimulationHandler) GenerateJWTw(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	token, err := s.service.GenerateJWT(*dto.ToPayloadJWTModel(*request))
+	token, err := s.service.GenerateJWT(*dto.ToPayloadJWTModel(request))
 
 	if err != nil {
 		//logar error
@@ -229,7 +229,7 @@ func (s *SimulationHandler) CreatedBorrower(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	request := &dto.BorrowerRequest{}
+	request := dto.BorrowerRequest{}
 
 	err = json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
@@ -237,14 +237,14 @@ func (s *SimulationHandler) CreatedBorrower(w http.ResponseWriter, r *http.Reque
 		utils.ErrorResponse(w, errors.UnprocessableEntityf("unprocessable entity error: %v", err))
 		return
 	}
-	error := utils.ValidateStruct(&request)
+	error := utils.ValidateStruct(request)
 	if error != nil {
 		//logar error
 		utils.ErrorResponse(w, errors.BadRequestf("bad request error: %v", err))
 		return
 	}
 
-	err = s.service.CreatedBorrower(dto.ToBorrowerModel(request))
+	err = s.service.CreatedBorrower(dto.ToBorrowerModel(&request))
 
 	if err != nil {
 		//logar error
@@ -286,13 +286,13 @@ func (s *SimulationHandler) CreatedSetup(w http.ResponseWriter, r *http.Request)
 	}
 	tokenJwt, err := s.service.TokenIsValid(token)
 
-	if err != nil && tokenJwt == nil {
+	if err != nil || tokenJwt == nil {
 
 		utils.ErrorResponse(w, errors.Unauthorizedf("Unauthorized error: %v", err))
 		return
 	}
 
-	request := &dto.SetupRequest{}
+	request := dto.SetupRequest{}
 
 	err = json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
@@ -307,7 +307,7 @@ func (s *SimulationHandler) CreatedSetup(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	err = s.service.CreatedSetup(dto.ToSetupModel(request))
+	err = s.service.CreatedSetup(dto.ToSetupModel(&request))
 
 	if err != nil {
 		//logar error
@@ -347,13 +347,13 @@ func (s *SimulationHandler) CreatedSimulation(w http.ResponseWriter, r *http.Req
 	}
 	tokenJwt, err := s.service.TokenIsValid(token)
 
-	if err != nil && tokenJwt == nil {
+	if err != nil || tokenJwt == nil {
 
 		utils.ErrorResponse(w, errors.Unauthorizedf("Unauthorized error: %v", err))
 		return
 	}
 
-	request := &dto.SimulationRequest{}
+	request := dto.SimulationRequest{}
 
 	err = json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
@@ -362,7 +362,14 @@ func (s *SimulationHandler) CreatedSimulation(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	err = s.service.CreatedSimulation(ctx, dto.ToSimulationModel(request), tokenJwt)
+	error := utils.ValidateStruct(request)
+	if error != nil {
+		//logar error
+		utils.ErrorResponse(w, errors.BadRequestf("bad request error: %v", err))
+		return
+	}
+
+	err = s.service.CreatedSimulation(ctx, dto.ToSimulationModel(&request), tokenJwt)
 
 	if err != nil {
 		//logar error

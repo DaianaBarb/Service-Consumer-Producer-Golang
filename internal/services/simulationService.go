@@ -97,12 +97,12 @@ func (s *SimulationService) CreatedSimulation(ctx context.Context, simu *model.S
 	// salvar simulação no banco
 	//enviar pra fila de notificações
 	//enviar pra fila pro tomador aceitar a siulação
-	_, err := s.checkAntiFraude(&dto.AntiFraudRequest{BorrowerId: simu.BorrowerId,
-		LoanValue: simu.LoanValue})
+	// _, err := s.checkAntiFraude(&dto.AntiFraudRequest{BorrowerId: simu.BorrowerId,
+	// 	LoanValue: simu.LoanValue})
 
-	if err != nil {
-		return err
-	}
+	// if err != nil {
+	// 	return err
+	// }
 
 	setup, err := s.repository.FindByIdSetup(os.Getenv("SETUP_ID"))
 	if err != nil {
@@ -249,8 +249,8 @@ func (s *SimulationService) validateScope(token *jwt.Token, expectedScope string
 
 	// Extrair os campos necessários do payload
 	payload := &model.PayloadJWT{
-		CredorID:  claims["credorId"].(string),
-		Escopo:    claims["Escopo"].(string),
+		CredorID:  claims["CredorId"].(string),
+		Escopo:    claims["Escope"].(string),
 		Expiracao: int64(claims["Expiracao"].(float64)), // Timestamp
 	}
 
@@ -309,13 +309,15 @@ func (s *SimulationService) sendMessageQueueBorrowerAceptOrRejectedSimulation(ct
 	return nil
 }
 
+//bloquear a geração de token frequente, sempre que a criação de token for chamada verificar se o tokan ja expirou
+
 func (s *SimulationService) GenerateJWT(payload model.PayloadJWT) (string, error) {
 	expiracao := time.Now().Add(48 * time.Hour) //expira com 2 dias apartir da hora atual
 	// Claims do token
 	claims := jwt.MapClaims{
-		"credorId":  payload.CredorID,
-		"Escopo":    payload.Escopo,
-		"Expiração": expiracao.Unix(),
+		"CredorId":  os.Getenv("CREDOR_ID"),
+		"Escope":    payload.Escopo,
+		"Expiracao": expiracao.Unix(),
 	}
 
 	// Cria o token com método de assinatura HS256

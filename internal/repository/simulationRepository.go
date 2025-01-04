@@ -77,9 +77,6 @@ func (r *Repository) CreatedSimulation(simu *entity.Simulation) (*entity.Simulat
 		&simula.UpdatedAt,
 		&simula.Status,
 		&simula.InterestRate,
-		
-		
-		
 	)
 
 	if err != nil {
@@ -148,24 +145,24 @@ func (r *Repository) UpdateSetup(setupId string, newSetup *entity.Setup) error {
 }
 
 func (r *Repository) FindByIdSimulation(simulationId string) (*entity.Simulation, error) {
-	simulation := &entity.Simulation{}
+	simulation := entity.Simulation{}
 
 	query := `
-	SELECT id, simulation_id, borrower_id, loan_value, number_installments, interest_rate, status, created_at, updated_at
-	FROM simulations
-	WHERE id = $1
+	SELECT  simulation_id, borrower_id, loan_value, number_of_installments, interest_rate, status, created_at, updated_at
+	FROM simulation
+	WHERE simulation_id = $1
 `
 	row := r.db.QueryRow(query, simulationId)
 
 	err := row.Scan(
-		simulation.SimulationId,
-		simulation.BorrowerId,
-		simulation.LoanValue,
-		simulation.NumberOfInstallments,
-		simulation.InterestRate,
-		simulation.Status,
-		simulation.CreatedAt,
-		simulation.UpdatedAt,
+		&simulation.SimulationId,
+		&simulation.BorrowerId,
+		&simulation.LoanValue,
+		&simulation.NumberOfInstallments,
+		&simulation.InterestRate,
+		&simulation.Status,
+		&simulation.CreatedAt,
+		&simulation.UpdatedAt,
 	)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -173,7 +170,7 @@ func (r *Repository) FindByIdSimulation(simulationId string) (*entity.Simulation
 		}
 		return nil, err
 	}
-	return simulation, nil
+	return &simulation, nil
 
 }
 func (r *Repository) FindByIdSetup(setupId string) (*entity.Setup, error) {
@@ -214,23 +211,23 @@ func (r *Repository) FindByIdSetup(setupId string) (*entity.Setup, error) {
 }
 func (r *Repository) FindByIdBorrower(borrwerId string) (*entity.Borrower, error) {
 
-	borrwer := &entity.Borrower{}
+	borrwer := entity.Borrower{}
 
 	query := `
-	SELECT borrwer_id, name, phone, email, cpf, created_at, updated_at
-	FROM borrwer
-	WHERE id = $1
+	SELECT borrower_id, name, phone, email, cpf, created_at, updated_at
+	FROM borrower
+	WHERE borrower_id = $1
 `
 	row := r.db.QueryRow(query, borrwerId)
 
 	err := row.Scan(
-		borrwer.BorrowerId,
-		borrwer.Name,
-		borrwer.Phone,
-		borrwer.Email,
-		borrwer.Cpf,
-		borrwer.CreatedAt,
-		borrwer.UpdatedAt,
+		&borrwer.BorrowerId,
+		&borrwer.Name,
+		&borrwer.Phone,
+		&borrwer.Email,
+		&borrwer.Cpf,
+		&borrwer.CreatedAt,
+		&borrwer.UpdatedAt,
 	)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -239,7 +236,7 @@ func (r *Repository) FindByIdBorrower(borrwerId string) (*entity.Borrower, error
 		return nil, err
 	}
 
-	return borrwer, nil
+	return &borrwer, nil
 
 }
 
@@ -249,7 +246,7 @@ func (r *Repository) GetSimulations(param *model.Params) ([]entity.Simulation, e
 	// Base query
 	query := `
 		SELECT id, borrower_id, interest_rate, status, loan_value,number_installments created_at,updated_at, simulation_id
-		FROM simulations
+		FROM simulation
 		WHERE 1=1
 	`
 

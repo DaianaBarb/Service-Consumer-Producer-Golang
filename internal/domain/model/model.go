@@ -14,8 +14,8 @@ type Simulation struct {
 	BorrowerId           string
 	LoanValue            float64 // valor emprestimo
 	NumberOfInstallments float64 // quantidade de parcelas
-	CreatedAt            *time.Time
-	UpdatedAt            *time.Time
+	CreatedAt            time.Time
+	UpdatedAt            time.Time
 	Status               string
 	InterestRate         float64
 }
@@ -61,7 +61,7 @@ type SimulationResponseBorrower struct {
 
 type PayloadJWT struct {
 	CredorID  string
-	Escopo    string
+	Escope    string
 	Expiracao int64
 }
 

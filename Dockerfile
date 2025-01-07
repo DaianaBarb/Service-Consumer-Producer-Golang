@@ -1,5 +1,4 @@
-# Etapa 1: Build (compilação da aplicação)
-# Usamos uma imagem Golang para compilar o código
+
 FROM golang:1.23.4-alpine AS build
 
 # Definir o diretório de trabalho dentro do contêiner
@@ -9,6 +8,7 @@ WORKDIR /app
 COPY go.mod go.sum ./
 
 # Baixar as dependências (sem copiar o código ainda)
+
 RUN go mod tidy
 
 # Copiar o código da aplicação (diretório cmd/api-server)

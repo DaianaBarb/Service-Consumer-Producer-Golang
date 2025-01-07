@@ -97,12 +97,12 @@ func (s *SimulationService) CreatedSimulation(ctx context.Context, simu *model.S
 	// salvar simulação no banco
 	//enviar pra fila de notificações
 	//enviar pra fila pro tomador aceitar a siulação
-	// _, err := s.checkAntiFraude(&dto.AntiFraudRequest{BorrowerId: simu.BorrowerId,
-	// 	LoanValue: simu.LoanValue})
+	_, err := s.checkAntiFraude(&dto.AntiFraudRequest{BorrowerId: simu.BorrowerId,
+		LoanValue: simu.LoanValue})
 
-	// if err != nil {
-	// 	return err
-	// }
+	if err != nil {
+		return err
+	}
 
 	setup, err := s.repository.FindByIdSetup(os.Getenv("SETUP_ID"))
 	if err != nil {
@@ -126,12 +126,6 @@ func (s *SimulationService) CreatedSimulation(ctx context.Context, simu *model.S
 		return err
 	}
 	err = s.sendMessageQueueNotification(ctx, &dto.QueuePublishPayload{
-		SimulationId: newSimu.SimulationId,
-	})
-	if err != nil {
-		return err
-	}
-	err = s.sendMessageQueueBorrowerAceptOrRejectedSimulation(ctx, &dto.QueuePublishPayload{
 		SimulationId: newSimu.SimulationId,
 	})
 	if err != nil {
@@ -250,7 +244,7 @@ func (s *SimulationService) validateScope(token *jwt.Token, expectedScope string
 	// Extrair os campos necessários do payload
 	payload := &model.PayloadJWT{
 		CredorID:  claims["CredorId"].(string),
-		Escopo:    claims["Escope"].(string),
+		Escope:    claims["Escope"].(string),
 		Expiracao: int64(claims["Expiracao"].(float64)), // Timestamp
 	}
 
@@ -260,8 +254,8 @@ func (s *SimulationService) validateScope(token *jwt.Token, expectedScope string
 	}
 
 	// Validar o escopo
-	if payload.Escopo != expectedScope {
-		return nil, fmt.Errorf("escopo inválido: esperado '%s', encontrado '%s'", expectedScope, payload.Escopo)
+	if payload.Escope != expectedScope {
+		return nil, fmt.Errorf("escopo inválido: esperado '%s', encontrado '%s'", expectedScope, payload.Escope)
 	}
 	return payload, nil
 
@@ -316,7 +310,7 @@ func (s *SimulationService) GenerateJWT(payload model.PayloadJWT) (string, error
 	// Claims do token
 	claims := jwt.MapClaims{
 		"CredorId":  os.Getenv("CREDOR_ID"),
-		"Escope":    payload.Escopo,
+		"Escope":    payload.Escope,
 		"Expiracao": expiracao.Unix(),
 	}
 

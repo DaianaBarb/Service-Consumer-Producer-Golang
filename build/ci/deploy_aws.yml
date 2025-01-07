@@ -1,0 +1,65 @@
+.deploy_aws:
+  extends: .helm_deploy
+  stage: deploy_aws
+  only:
+    - /^v[0-9]+.[0-9]+.[0-9]+-aws/
+  when: manual
+  dependencies:
+    - build
+    - push_docker_image
+  variables:
+    K8S_CLUSTER_SERVER: ${K8S_CLUSTER_SERVER_AWS_VA_NPF}
+    K8S_USER_TOKEN: ${K8S_USER_TOKEN_AWS_VA_NPF}
+    NAMESPACE: team
+    RELEASE: '${APP_NAME}-${PACKAGE_VERSION}-${ENVIRONMENT_NAME}-${APP_BRAND}'
+    CONFIGS: './deployments/k8s/${APP_NAME}-${PACKAGE_VERSION}-${ENVIRONMENT_NAME}.yml'
+    KIND: deployment
+    VERSION: '${PACKAGE_VERSION}-${CI_PIPELINE_ID}'
+  environment:
+    name: '${ENVIRONMENT_NAME}'
+
+.deploy_aws_prod:
+  extends: .deploy_aws
+  before_script:
+    - sed -i ${SED_BRAND_PLACEHOLDER} ./deployments/k8s/api-simulations-v1-prod-npf-aws-us-east-1.yml
+    - sed -i ${SED_APPNAME_PLACEHOLDER} ./deployments/k8s/api-simulations-v1-prod-npf-aws-us-east-1.yml
+    - sed -i ${SED_QUEUE_PLACEHOLDER} ./deployments/k8s/api-simulations-v1-prod-npf-aws-us-east-1.yml 
+    - cat ./deployments/k8s/api-simulations-v1-prod-npf-aws-us-east-1.yml
+  variables:
+    SED_BRAND_PLACEHOLDER: s/BRAND_PLACEHOLDER/${ APP_TENANT}/g
+    SED_APPNAME_PLACEHOLDER: s/APPNAME_PLACEHOLDER/${ APP_TENANT}${APP_MASSIVE}/g
+    ENVIRONMENT_NAME: 'prod-npf-aws-us-east-1'
+  artifacts:
+    paths:
+      - ./deployments/k8s/api-simulations-v1-prod-npf-aws-us-east-1.yml
+
+
+prod:deploy:acom:aws:
+  extends: .deploy_aws_prod
+  variables:
+    APP_TENANT: 'acom'
+
+prod:deploy:acom:aws:
+  extends: .deploy_aws_prod
+  variables:
+     APP_TENANT: 'acom'
+
+  
+
+
+
+prod:deploy:aemp:aws:
+  extends: .deploy_aws_prod
+  variables:
+     APP_TENANT: 'aemp'
+
+  
+
+
+
+prod:deploy:shop:aws:
+  extends: .deploy_aws_prod
+  variables:
+     APP_TENANT: 'shop'
+  
+

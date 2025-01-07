@@ -1,0 +1,14 @@
+# BUILD
+build:
+  image: ${GO_IMAGE}
+  stage: build
+  when: manual
+  cache:
+    untracked: true
+  script:
+    - make git-config-CI
+    - make build
+    - mv ./bin/main ${ARTIFACT_NAME}
+  artifacts:
+    paths:
+      - ${ARTIFACT_NAME}

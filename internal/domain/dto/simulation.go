@@ -19,7 +19,7 @@ type QueuePublishPayload struct {
 }
 
 type JwtRequest struct {
-	Escopo string `json:"escopo"`
+	Escope string `json:"escope"`
 }
 
 type SimulationRequest struct {
@@ -39,8 +39,8 @@ type SimulationResponse struct {
 	BorrowerId           string     `json:"borrowerId "`
 	LoanValue            float64    `json:"loanValue"`
 	NumberOfInstallments float64    `json:"numberOfInstallments"`
-	CreatedAt            *time.Time `json:"createdAt "`
-	UpdatedAt            *time.Time `json:"updatedAt "`
+	CreatedAt            time.Time `json:"createdAt "`
+	UpdatedAt            time.Time `json:"updatedAt "`
 	Status               string     `json:"satus"`
 	InterestRate         float64    `json:"interestRate "`
 }
@@ -62,7 +62,7 @@ type JwtResponse struct {
 
 func ToPayloadJWTModel(r JwtRequest) *model.PayloadJWT {
 	return &model.PayloadJWT{
-		Escopo: r.Escopo,
+		Escope: r.Escope,
 	}
 
 }

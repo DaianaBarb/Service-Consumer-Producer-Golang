@@ -11,3 +11,5 @@ aws configure list
 # cria a fila local
 
 aws sqs create-queue --endpoint-url http://localhost:4566 --queue-name testQueue --profile localstack
+aws sqs create-queue --endpoint-url http://localhost:4566 --queue-name testQueue2 --profile localstack
+

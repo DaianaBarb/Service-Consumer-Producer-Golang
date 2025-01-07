@@ -5,14 +5,14 @@ import (
 )
 
 type Simulation struct {
-	SimulationId         string
-	BorrowerId           string
-	LoanValue            float64 // valor emprestimo
-	NumberOfInstallments float64 // quantidade de parcelas
-	CreatedAt            *time.Time
-	UpdatedAt            *time.Time
-	Status               string
-	InterestRate         float64
+	SimulationId         string    `json:"simulation_id"`
+	BorrowerId           string    `json:"borrower_id"`
+	LoanValue            float64   `json:"loan_value"`             // valor emprestimo
+	NumberOfInstallments float64   `json:"number_of_installments"` // quantidade de parcelas
+	CreatedAt            time.Time `json:"created_at"`
+	UpdatedAt            time.Time `json:"updated_at"`
+	Status               string    `json:"status"`
+	InterestRate         float64   `json:"interest_rate"`
 }
 
 type Borrower struct {

@@ -9,6 +9,8 @@ import (
 	"project-golang/internal/domain/model"
 	"project-golang/internal/logger"
 	"sync"
+
+	"github.com/google/uuid"
 )
 
 var tenantConfigCache = sync.Map{}
@@ -49,11 +51,12 @@ func NewRepository(db *sql.DB, log logger.ILogCloudWatch) IRepository {
 }
 
 func (r *Repository) CreatedSimulation(simu *entity.Simulation) (*entity.Simulation, error) {
-	simula := entity.Simulation{}
+	var simula entity.Simulation
 
+	var SimulationId uuid.UUID
 	query := `
-		INSERT INTO simulation (borrower_id, loan_value, number_of_installments, interest_rate, status, created_at, updated_at)
-		VALUES ($1, $2, $3, $4, $5, NOW(), NOW()) RETURNING *;
+		INSERT INTO simulation (borrower_id, loan_value, number_of_installments, status, interest_rate, created_at, updated_at)
+		VALUES ($1, $2, $3, $4, $5, NOW(), NOW()) RETURNING simulation_id, borrower_id, loan_value, number_of_installments, status, interest_rate, created_at, updated_at;
 	`
 
 	// _, err := r.db.Exec(query, simu.BorrowerId, simu.LoanValue, simu.NumberOfInstallments, simu.InterestRate, simu.Status)
@@ -66,22 +69,23 @@ func (r *Repository) CreatedSimulation(simu *entity.Simulation) (*entity.Simulat
 		simu.BorrowerId,
 		simu.LoanValue,
 		simu.NumberOfInstallments,
-		simu.InterestRate,
 		simu.Status,
+		simu.InterestRate,
 	).Scan(
-		&simula.SimulationId,
+		&SimulationId,
 		&simula.BorrowerId,
 		&simula.LoanValue,
 		&simula.NumberOfInstallments,
-		&simula.CreatedAt,
-		&simula.UpdatedAt,
 		&simula.Status,
 		&simula.InterestRate,
+		&simula.CreatedAt,
+		&simula.UpdatedAt,
 	)
 
 	if err != nil {
 		return nil, err
 	}
+	simu.SimulationId = SimulationId.String()
 
 	return simu, nil
 

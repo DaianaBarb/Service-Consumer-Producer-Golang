@@ -1,0 +1,55 @@
+application:
+  name: simulations-api-v1
+  flow: npf
+
+environment:
+  config:
+    APP_ENV: "production"
+
+deployment:
+  scale:
+    cpu: 75
+    minReplicas: 4
+    maxReplicas: 16
+  container:
+    image:
+      repository: registry.seu-registry.io
+      namespace: mynamespace
+      name: simulations-api
+    resources:
+      requests:
+        memory: 56Mi
+        cpu: 0.15
+      limits:
+        memory: 80Mi
+        cpu: 0.4
+    port: 8080
+    probe:
+      readiness:
+        initialDelay: 30
+        period: 5
+      liveness:
+        initialDelay: 30
+        period: 5
+
+expose:
+  hosts:
+    - host: simulations-api-v1.internal.b2w.io
+      paths:
+        - /*
+      ssl: true
+      public: false
+      config: {}
+
+ambassador:
+  enabled: false
+
+datadog:
+  enabled: true
+  service: b2w/team/simulations-api
+  version: v1
+  env: production
+
+externalSecret:
+  enabled: true
+  

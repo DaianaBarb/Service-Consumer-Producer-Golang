@@ -8,7 +8,7 @@ aws_push_docker_image:
   dependencies:
     - build
   script:
-    - docker build --build-arg ARTIFACT_NAME=${ARTIFACT_NAME} --build-arg AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} --build-arg AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} --tag registry.seu-registry.io/seu-registrydigital/${APP_NAME}:${PACKAGE_VERSION}-${CI_PIPELINE_ID} -f ./build/docker/Dockerfile .
+    - docker build --build-arg ARTIFACT_NAME=${ARTIFACT_NAME} --build-arg AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} --build-arg AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} --tag registry.seu-registry.io/seu-registry/${APP_NAME}:${PACKAGE_VERSION}-${CI_PIPELINE_ID} -f ./build/docker/Dockerfile .
     - docker push registry.seu-registry.io/seu-registry/${APP_NAME}:${PACKAGE_VERSION}-${CI_PIPELINE_ID}
   environment:
     name: registry.seu-registry.io

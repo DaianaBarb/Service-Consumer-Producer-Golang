@@ -1,0 +1,41 @@
+lint:
+  image: seu-registry.io/seu-registry/golang-lint:v1.47.1-alpine
+  stage: tests-api
+  when: manual
+  except:
+    - master
+  variables:
+    ENABLE_LINT: "true"
+  script: 
+   - go mod tidy
+   - if [[ $ENABLE_LINT = "true" ]]; then make lint; fi
+
+   stages:
+  - test
+  - build
+  - push_docker_image
+  - deploy
+  - tests-api
+
+
+  default:
+  tags:
+  - team-k8s
+
+services:
+- name: seu-registry/docker/docker:20.10.21-dind
+  command: [--tls=false]
+  
+variables:
+  APP_NAME: "simulations-api"
+  PACKAGE_VERSION: "v1"
+  CI_DEBUG_TRACE: "true"
+  ARTIFACT_NAME: "${APP_NAME}-${CI_PIPELINE_ID}"
+  SNYK_ORG: $SNYK_ORG_DIGITAL_FRONT
+  SNYK_TOKEN: $SNYK_TOKEN_ORG_DIGITAL_FRONT
+  GOLANG_VERSION: "1.21"
+  GOLANG_CONFIG_GITLAB: "true"
+  DOCKER_HOST: tcp://127.0.0.1:002541
+  DOCKER_TLS_CERTDIR: ''
+  DOCKER_DRIVER: overlay2
+  SEC_CHECK_JOB_TAG: team-k8s

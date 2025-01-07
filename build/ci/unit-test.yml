@@ -1,0 +1,8 @@
+unit-test:
+  image: registry.b2w.io/b2wdigital/appsec/base-images/golang1.21-alpine3:0.3
+  stage: tests-api
+  when: manual
+  script: 
+   - make git-config-CI
+   - go mod tidy
+   - make test

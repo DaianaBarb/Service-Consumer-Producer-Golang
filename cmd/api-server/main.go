@@ -38,7 +38,7 @@ func LoadEnv() {
 }
 
 func init() {
-	if err := godotenv.Load("../../configs/prod.env"); err != nil && !os.IsNotExist(err) {
+	if err := godotenv.Load("../../configs/.prod.env"); err != nil && !os.IsNotExist(err) {
 		logrus.WithFields(logrus.Fields{
 			"application": "consumer",
 		}).Fatalf("Error loading .env - %s", err.Error())

@@ -1,7 +1,9 @@
 package dto
 
 import (
+	"project-golang/internal/domain/entity"
 	"project-golang/internal/domain/model"
+	"strconv"
 	"time"
 )
 
@@ -35,14 +37,14 @@ type HelfCheckResponse struct {
 }
 
 type SimulationResponse struct {
-	SimulationId         string     `json:"simulationId "`
-	BorrowerId           string     `json:"borrowerId "`
-	LoanValue            float64    `json:"loanValue"`
-	NumberOfInstallments float64    `json:"numberOfInstallments"`
+	SimulationId         string    `json:"simulationId "`
+	BorrowerId           string    `json:"borrowerId "`
+	LoanValue            float64   `json:"loanValue"`
+	NumberOfInstallments float64   `json:"numberOfInstallments"`
 	CreatedAt            time.Time `json:"createdAt "`
 	UpdatedAt            time.Time `json:"updatedAt "`
-	Status               string     `json:"satus"`
-	InterestRate         float64    `json:"interestRate "`
+	Status               string    `json:"satus"`
+	InterestRate         float64   `json:"interestRate "`
 }
 
 type SimulationPaginationResponse struct {
@@ -131,6 +133,30 @@ func ToSimulationModel(s *SimulationRequest) *model.Simulation {
 		LoanValue:            s.LoanValue,
 		NumberOfInstallments: s.NumberOfInstallments,
 		InterestRate:         s.InterestRate,
+	}
+
+}
+
+func ToSimulationPaginationResponse(page, pageSize int, simulations []entity.Simulation) *SimulationPaginationResponse {
+
+	simuResp := []SimulationResponse{}
+
+	for _, s := range simulations {
+
+		simuResp = append(simuResp, SimulationResponse{SimulationId: s.SimulationId,
+			BorrowerId:           s.BorrowerId,
+			LoanValue:            s.LoanValue,
+			NumberOfInstallments: s.NumberOfInstallments,
+			CreatedAt:            s.CreatedAt,
+			UpdatedAt:            s.UpdatedAt,
+			Status:               s.Status,
+			InterestRate:         s.InterestRate})
+
+	}
+	return &SimulationPaginationResponse{
+		Simulations: simuResp,
+		Page:        strconv.Itoa(page),
+		PageSize:    strconv.Itoa(pageSize),
 	}
 
 }

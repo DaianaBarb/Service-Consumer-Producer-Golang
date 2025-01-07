@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 	"fmt"
@@ -9,6 +10,7 @@ import (
 	"project-golang/internal/domain/model"
 	"project-golang/internal/logger"
 	"sync"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -247,47 +249,48 @@ func (r *Repository) FindByIdBorrower(borrwerId string) (*entity.Borrower, error
 func (r *Repository) GetSimulations(param *model.Params) ([]entity.Simulation, error) {
 
 	offset := (param.Page - 1) * param.PageSize
+	var SimulationId uuid.UUID
 	// Base query
 	query := `
-		SELECT id, borrower_id, interest_rate, status, loan_value,number_installments created_at,updated_at, simulation_id
+		SELECT simulation_Id, borrower_id, interest_rate, status, loan_value, number_of_installments, created_at, updated_at
 		FROM simulation
 		WHERE 1=1
 	`
 
 	// Dynamic filters
 	args := []interface{}{}
-	if param.Simu.BorrowerId != nil {
-		query += " AND borrower_id = $1"
-		args = append(args, *param.Simu.BorrowerId)
-	}
-	if param.Simu.InterestRate != nil {
-		query += fmt.Sprintf(" AND interest_rate = $%d", len(args)+1)
-		args = append(args, *param.Simu.InterestRate)
-	}
-	if param.Simu.Status != nil {
-		query += fmt.Sprintf(" AND status = $%d", len(args)+1)
-		args = append(args, *param.Simu.Status)
-	}
-	if param.Simu.LoanValue != nil {
-		query += fmt.Sprintf(" AND loan_value = $%d", len(args)+1)
-		args = append(args, *param.Simu.LoanValue)
-	}
-	if param.Simu.NumberOfInstallments != nil {
-		query += fmt.Sprintf(" AND number_installments = $%d", len(args)+1)
-		args = append(args, *param.Simu.NumberOfInstallments)
-	}
-	if param.Simu.CreatedAt != nil {
-		query += fmt.Sprintf(" AND created_at = $%d", len(args)+1)
-		args = append(args, *param.Simu.CreatedAt)
-	}
-	if param.Simu.UpdatedAt != nil {
-		query += fmt.Sprintf(" AND updated_at = $%d", len(args)+1)
-		args = append(args, *param.Simu.UpdatedAt)
-	}
-	if param.Simu.SimulationId != nil {
+	if param.Simu.SimulationId != nil && *param.Simu.SimulationId != "" {
 		query += fmt.Sprintf(" AND simulation_id = $%d", len(args)+1)
 		args = append(args, *param.Simu.SimulationId)
 	}
+	if param.Simu.BorrowerId != nil && *param.Simu.BorrowerId != "" {
+		query += fmt.Sprintf(" AND borrower_id = $%d", len(args)+1)
+		args = append(args, *param.Simu.BorrowerId)
+	}
+	if param.Simu.InterestRate != nil && *param.Simu.InterestRate != 0 {
+		query += fmt.Sprintf(" AND interest_rate = $%d", len(args)+1)
+		args = append(args, *param.Simu.InterestRate)
+	}
+	if param.Simu.Status != nil && *param.Simu.Status != "" {
+		query += fmt.Sprintf(" AND status = $%d", len(args)+1)
+		args = append(args, *param.Simu.Status)
+	}
+	if param.Simu.LoanValue != nil && *param.Simu.LoanValue != 0 {
+		query += fmt.Sprintf(" AND loan_value = $%d", len(args)+1)
+		args = append(args, *param.Simu.LoanValue)
+	}
+	if param.Simu.NumberOfInstallments != nil && *param.Simu.NumberOfInstallments != 0 {
+		query += fmt.Sprintf(" AND number_of_installments = $%d", len(args)+1)
+		args = append(args, *param.Simu.NumberOfInstallments)
+	}
+	if ((param.Simu.CreatedAt != nil) && (*param.Simu.CreatedAt != time.Time{}) ){
+		query += fmt.Sprintf(" AND created_at = $%d", len(args)+1)
+		args = append(args, *param.Simu.CreatedAt)
+	}
+	// if param.Simu.UpdatedAt != nil {
+	// 	query += fmt.Sprintf(" AND updated_at = $%d", len(args)+1)
+	// 	args = append(args, *param.Simu.UpdatedAt)
+	// }
 
 	// Adiciona paginação
 	query += fmt.Sprintf(" ORDER BY created_at DESC LIMIT $%d OFFSET $%d", len(args)+1, len(args)+2)
@@ -303,12 +306,26 @@ func (r *Repository) GetSimulations(param *model.Params) ([]entity.Simulation, e
 	// Parse dos resultados
 	var simulations []entity.Simulation
 	for rows.Next() {
+
+		
 		var sim entity.Simulation
-		if err := rows.Scan(&sim.SimulationId, &sim.BorrowerId, &sim.LoanValue, &sim.NumberOfInstallments, &sim.InterestRate, &sim.Status, &sim.CreatedAt, &sim.UpdatedAt); err != nil {
+		if err := rows.Scan(&SimulationId, &sim.BorrowerId,&sim.InterestRate, &sim.Status, &sim.LoanValue, &sim.NumberOfInstallments, &sim.CreatedAt, &sim.UpdatedAt); err != nil {
 			return nil, err
 		}
+		sim.SimulationId = SimulationId.String()
 		simulations = append(simulations, sim)
 	}
 
 	return simulations, nil
+}
+
+func (r *Repository) setSchema(ctx context.Context, schema string) error {
+	// schema e igual ao schema do tenant
+	_, err := r.db.ExecContext(ctx, "SET search_path TO %s", schema)
+	if err != nil {
+		return err
+	}
+
+	return nil
+
 }

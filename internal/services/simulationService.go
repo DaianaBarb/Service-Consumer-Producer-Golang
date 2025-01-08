@@ -159,6 +159,7 @@ func (s *SimulationService) FindByIdSetup(setupId string, schema string) (*model
 	set, err := s.repository.FindByIdSetup(setupId, schema)
 
 	if err != nil {
+		return nil,err
 
 	}
 	if (set != &entity.Setup{}) {
@@ -189,7 +190,7 @@ func (s *SimulationService) UpdateSetup(newSetup *model.Setup, schema string) er
 		return err
 	}
 	if escope {
-		return s.repository.UpdateSetup(os.ExpandEnv("SETUP_ID"), model.ToSetupEntity(newSetup), schema)
+		return s.repository.UpdateSetup(os.Getenv("SETUP_ID"), model.ToSetupEntity(newSetup), schema)
 
 	}
 	return errors.New("escopo invalido")

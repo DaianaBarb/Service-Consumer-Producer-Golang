@@ -67,12 +67,14 @@ type PayloadJWT struct {
 
 func ToSetupEntity(setup *Setup) *entity.Setup {
 	return &entity.Setup{
-		SetupId:      setup.SetupId,
-		Capital:      setup.Capital,
-		Fees:         setup.Fees,
-		InterestRate: setup.InterestRate,
-		CreatedAt:    setup.CreatedAt,
-		UpdatedAt:    setup.UpdatedAt,
+		SetupId:       setup.SetupId,
+		Capital:       setup.Capital,
+		Fees:          setup.Fees,
+		InterestRate:  setup.InterestRate,
+		CreatedAt:     setup.CreatedAt,
+		UpdatedAt:     setup.UpdatedAt,
+		Escope:        setup.Escope,
+		EscopeIsValid: setup.EscopeIsValid,
 	}
 
 }
@@ -109,12 +111,14 @@ func ToSimulationModel(simu *entity.Simulation) *Simulation {
 
 func ToSetupModel(setup *entity.Setup) *Setup {
 	return &Setup{
-		SetupId:      setup.SetupId,
-		Capital:      setup.Capital,
-		Fees:         setup.Fees,
-		InterestRate: setup.InterestRate,
-		CreatedAt:    setup.CreatedAt,
-		UpdatedAt:    setup.UpdatedAt,
+		SetupId:       setup.SetupId,
+		Capital:       setup.Capital,
+		Fees:          setup.Fees,
+		InterestRate:  setup.InterestRate,
+		CreatedAt:     setup.CreatedAt,
+		UpdatedAt:     setup.UpdatedAt,
+		Escope:        setup.Escope,
+		EscopeIsValid: setup.EscopeIsValid,
 	}
 
 }
@@ -122,7 +126,7 @@ func ToSetupModel(setup *entity.Setup) *Setup {
 func ToBorrowerdModel(bo *entity.Borrower) *Borrower {
 	return &Borrower{
 		BorrowerId: bo.BorrowerId,
-		Name:       bo.BorrowerId,
+		Name:       bo.Name,
 		Phone:      bo.Phone,
 		Email:      bo.Email,
 		Cpf:        bo.Cpf,

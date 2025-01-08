@@ -3,33 +3,13 @@ package handlres
 import (
 	"net/http"
 	service "project-golang/internal/services"
-	"reflect"
+	"project-golang/internal/services/mocks"
 	"testing"
 )
 
-func TestNewSimulationHandler(t *testing.T) {
-	type args struct {
-		serv service.ISimulationService
-	}
-	tests := []struct {
-		name string
-		args args
-		want ISimulationHandler
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := NewSimulationHandler(tt.args.serv); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewSimulationHandler() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
 func TestSimulationHandler_FindSimulationsByParam(t *testing.T) {
 	type fields struct {
-		service service.ISimulationService
+		service *mocks.ISimulationService
 	}
 	type args struct {
 		w http.ResponseWriter
@@ -39,6 +19,7 @@ func TestSimulationHandler_FindSimulationsByParam(t *testing.T) {
 		name   string
 		fields fields
 		args   args
+		mock    func(*mocks.ISimulationService)
 	}{
 		// TODO: Add test cases.
 	}

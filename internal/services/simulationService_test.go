@@ -724,153 +724,153 @@ func TestSimulationService_CreatedSimulation(t *testing.T) {
 
 			},
 		},
-		// {
-		// 	name: "error invalid setup",
-		// 	fields: fields{
-		// 		repository:    new(mockRepo.IRepository),
-		// 		sqsClient:     new(mocks.Client),
-		// 		apiAntifraude: new(mockApi.IApiAntifraude),
-		// 	},
-		// 	args: args{
-		// 		ctx: context.Background(),
-		// 		simu: &model.Simulation{
-		// 			BorrowerId:           "672c85c7-ea1e-",
-		// 			LoanValue:            50.000,
-		// 			InterestRate:         500.00,
-		// 			NumberOfInstallments: 12,
-		// 		},
-		// 		token:  token,
-		// 		schema: "TENANT_1",
-		// 	},
-		// 	wantErr: true,
-		// 	mock: func(repo *mockRepo.IRepository, sqsClient *mocks.Client, apiAntifraude *mockApi.IApiAntifraude) {
+		{
+			name: "error invalid setup",
+			fields: fields{
+				repository:    new(mockRepo.IRepository),
+				sqsClient:     new(mocks.Client),
+				apiAntifraude: new(mockApi.IApiAntifraude),
+			},
+			args: args{
+				ctx: context.Background(),
+				simu: &model.Simulation{
+					BorrowerId:           "672c85c7-ea1e-",
+					LoanValue:            50.000,
+					InterestRate:         500.00,
+					NumberOfInstallments: 12,
+				},
+				token:  token,
+				schema: "TENANT_1",
+			},
+			wantErr: true,
+			mock: func(repo *mockRepo.IRepository, sqsClient *mocks.Client, apiAntifraude *mockApi.IApiAntifraude) {
 
-		// 		repo.On("FindByIdSetup", mock.Anything, mock.Anything).Return(nil, errors.New("setup not found"))
-		// 		apiAntifraude.On("CheckAntiFraud", mock.Anything).Return(&dto.AntiFraudResponse{
-		// 			BorrowerId: "672c85c7-ea1e-",
-		// 		}, nil)
-		// 	},
-		// },
-		// {
-		// 	name: "error antifraud validation",
-		// 	fields: fields{
-		// 		repository:    new(mockRepo.IRepository),
-		// 		sqsClient:     new(mocks.Client),
-		// 		apiAntifraude: new(mockApi.IApiAntifraude),
-		// 	},
-		// 	args: args{
-		// 		ctx: context.Background(),
-		// 		simu: &model.Simulation{
-		// 			BorrowerId:           "672c85c7-ea1e-",
-		// 			LoanValue:            50.000,
-		// 			InterestRate:         500.00,
-		// 			NumberOfInstallments: 12,
-		// 		},
-		// 		token:  token,
-		// 		schema: "TENANT_1",
-		// 	},
-		// 	wantErr: true,
-		// 	mock: func(repo *mockRepo.IRepository, sqsClient *mocks.Client, apiAntifraude *mockApi.IApiAntifraude) {
+				repo.On("FindByIdSetup", mock.Anything, mock.Anything).Return(nil, errors.New("setup not found"))
+				apiAntifraude.On("CheckAntiFraud", mock.Anything).Return(&dto.AntiFraudResponse{
+					BorrowerId: "672c85c7-ea1e-",
+				}, nil)
+			},
+		},
+		{
+			name: "error antifraud validation",
+			fields: fields{
+				repository:    new(mockRepo.IRepository),
+				sqsClient:     new(mocks.Client),
+				apiAntifraude: new(mockApi.IApiAntifraude),
+			},
+			args: args{
+				ctx: context.Background(),
+				simu: &model.Simulation{
+					BorrowerId:           "672c85c7-ea1e-",
+					LoanValue:            50.000,
+					InterestRate:         500.00,
+					NumberOfInstallments: 12,
+				},
+				token:  token,
+				schema: "TENANT_1",
+			},
+			wantErr: true,
+			mock: func(repo *mockRepo.IRepository, sqsClient *mocks.Client, apiAntifraude *mockApi.IApiAntifraude) {
 
-		// 		repo.On("FindByIdSetup", mock.Anything, mock.Anything).Return(&entity.Setup{
-		// 			SetupId:       "TENANT_1",
-		// 			Capital:       50.000,
-		// 			Fees:          10.000,
-		// 			InterestRate:  500.00,
-		// 			Escope:        "escope",
-		// 			EscopeIsValid: true,
-		// 			CreatedAt:     &creatAt,
-		// 		}, nil)
+				repo.On("FindByIdSetup", mock.Anything, mock.Anything).Return(&entity.Setup{
+					SetupId:       "TENANT_1",
+					Capital:       50.000,
+					Fees:          10.000,
+					InterestRate:  500.00,
+					Escope:        "escope",
+					EscopeIsValid: true,
+					CreatedAt:     &creatAt,
+				}, nil)
 
-		// 		apiAntifraude.On("CheckAntiFraud", mock.Anything).Return(nil, errors.New("antifraud failed"))
-		// 	},
-		// },
-		// {
-		// 	name: "error creating simulation",
-		// 	fields: fields{
-		// 		repository:    new(mockRepo.IRepository),
-		// 		sqsClient:     new(mocks.Client),
-		// 		apiAntifraude: new(mockApi.IApiAntifraude),
-		// 	},
-		// 	args: args{
-		// 		ctx: context.Background(),
-		// 		simu: &model.Simulation{
-		// 			BorrowerId:           "672c85c7-ea1e-",
-		// 			LoanValue:            50.000,
-		// 			InterestRate:         500.00,
-		// 			NumberOfInstallments: 12,
-		// 		},
-		// 		token:  token,
-		// 		schema: "TENANT_1",
-		// 	},
-		// 	wantErr: true,
-		// 	mock: func(repo *mockRepo.IRepository, sqsClient *mocks.Client, apiAntifraude *mockApi.IApiAntifraude) {
+				apiAntifraude.On("CheckAntiFraud", mock.Anything).Return(nil, errors.New("antifraud failed"))
+			},
+		},
+		{
+			name: "error creating simulation",
+			fields: fields{
+				repository:    new(mockRepo.IRepository),
+				sqsClient:     new(mocks.Client),
+				apiAntifraude: new(mockApi.IApiAntifraude),
+			},
+			args: args{
+				ctx: context.Background(),
+				simu: &model.Simulation{
+					BorrowerId:           "672c85c7-ea1e-",
+					LoanValue:            50.000,
+					InterestRate:         500.00,
+					NumberOfInstallments: 12,
+				},
+				token:  token,
+				schema: "TENANT_1",
+			},
+			wantErr: true,
+			mock: func(repo *mockRepo.IRepository, sqsClient *mocks.Client, apiAntifraude *mockApi.IApiAntifraude) {
 
-		// 		repo.On("FindByIdSetup", mock.Anything, mock.Anything).Return(&entity.Setup{
-		// 			SetupId:       "TENANT_1",
-		// 			Capital:       50.000,
-		// 			Fees:          10.000,
-		// 			InterestRate:  500.00,
-		// 			Escope:        "escope",
-		// 			EscopeIsValid: true,
-		// 			CreatedAt:     &creatAt,
-		// 		}, nil)
+				repo.On("FindByIdSetup", mock.Anything, mock.Anything).Return(&entity.Setup{
+					SetupId:       "TENANT_1",
+					Capital:       50.000,
+					Fees:          10.000,
+					InterestRate:  500.00,
+					Escope:        "escope",
+					EscopeIsValid: true,
+					CreatedAt:     &creatAt,
+				}, nil)
 
-		// 		apiAntifraude.On("CheckAntiFraud", mock.Anything).Return(&dto.AntiFraudResponse{
-		// 			BorrowerId: "672c85c7-ea1e-",
-		// 		}, nil)
+				apiAntifraude.On("CheckAntiFraud", mock.Anything).Return(&dto.AntiFraudResponse{
+					BorrowerId: "672c85c7-ea1e-",
+				}, nil)
 
-		// 		repo.On("CreatedSimulation", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil, errors.New("database error"))
-		// 	},
-		// },
-		// {
-		// 	name: "error sending message to SQS",
-		// 	fields: fields{
-		// 		repository:    new(mockRepo.IRepository),
-		// 		sqsClient:     new(mocks.Client),
-		// 		apiAntifraude: new(mockApi.IApiAntifraude),
-		// 	},
-		// 	args: args{
-		// 		ctx: context.Background(),
-		// 		simu: &model.Simulation{
-		// 			BorrowerId:           "672c85c7-ea1e-",
-		// 			LoanValue:            50.000,
-		// 			InterestRate:         500.00,
-		// 			NumberOfInstallments: 12,
-		// 		},
-		// 		token:  token,
-		// 		schema: "TENANT_1",
-		// 	},
-		// 	wantErr: true,
-		// 	mock: func(repo *mockRepo.IRepository, sqsClient *mocks.Client, apiAntifraude *mockApi.IApiAntifraude) {
+				repo.On("CreatedSimulation", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil, errors.New("database error"))
+			},
+		},
+		{
+			name: "error sending message to SQS",
+			fields: fields{
+				repository:    new(mockRepo.IRepository),
+				sqsClient:     new(mocks.Client),
+				apiAntifraude: new(mockApi.IApiAntifraude),
+			},
+			args: args{
+				ctx: context.Background(),
+				simu: &model.Simulation{
+					BorrowerId:           "672c85c7-ea1e-",
+					LoanValue:            50.000,
+					InterestRate:         500.00,
+					NumberOfInstallments: 12,
+				},
+				token:  token,
+				schema: "TENANT_1",
+			},
+			wantErr: true,
+			mock: func(repo *mockRepo.IRepository, sqsClient *mocks.Client, apiAntifraude *mockApi.IApiAntifraude) {
 
-		// 		repo.On("FindByIdSetup", mock.Anything, mock.Anything).Return(&entity.Setup{
-		// 			SetupId:       "TENANT_1",
-		// 			Capital:       50.000,
-		// 			Fees:          10.000,
-		// 			InterestRate:  500.00,
-		// 			Escope:        "escope",
-		// 			EscopeIsValid: true,
-		// 			CreatedAt:     &creatAt,
-		// 		}, nil)
+				repo.On("FindByIdSetup", mock.Anything, mock.Anything).Return(&entity.Setup{
+					SetupId:       "TENANT_1",
+					Capital:       50.000,
+					Fees:          10.000,
+					InterestRate:  500.00,
+					Escope:        "escope",
+					EscopeIsValid: true,
+					CreatedAt:     &creatAt,
+				}, nil)
 
-		// 		apiAntifraude.On("CheckAntiFraud", mock.Anything).Return(&dto.AntiFraudResponse{
-		// 			BorrowerId: "672c85c7-ea1e-",
-		// 		}, nil)
+				apiAntifraude.On("CheckAntiFraud", mock.Anything).Return(&dto.AntiFraudResponse{
+					BorrowerId: "672c85c7-ea1e-",
+				}, nil)
 
-		// 		repo.On("CreatedSimulation", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(&entity.Simulation{
-		// 			SimulationId:         "672c85c7-ea1e-43c8",
-		// 			BorrowerId:           "672c85c7-ea1e-",
-		// 			LoanValue:            50.00,
-		// 			InterestRate:         500.00,
-		// 			NumberOfInstallments: 12,
-		// 			Status:               "CREATED",
-		// 			CreatedAt:            creatAt,
-		// 		}, nil)
+				repo.On("CreatedSimulation", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(&entity.Simulation{
+					SimulationId:         "672c85c7-ea1e-43c8",
+					BorrowerId:           "672c85c7-ea1e-",
+					LoanValue:            50.00,
+					InterestRate:         500.00,
+					NumberOfInstallments: 12,
+					Status:               "CREATED",
+					CreatedAt:            creatAt,
+				}, nil)
 
-		// 		sqsClient.On("SendMessage", mock.Anything, mock.Anything).Return(nil, errors.New("sqs error"))
-		// 	},
-		// },
+				sqsClient.On("SendMessage", mock.Anything, mock.Anything).Return(nil, errors.New("sqs error"))
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

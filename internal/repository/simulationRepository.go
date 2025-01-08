@@ -18,15 +18,15 @@ import (
 var tenantConfigCache = sync.Map{}
 
 type IRepository interface {
-	CreatedSimulation(simu *entity.Simulation) (*entity.Simulation, error)
-	CreatedBorrower(tom *entity.Borrower) error
-	CreatedSetup(set *entity.Setup) error
-	FindByIdSimulation(simulationId string) (*entity.Simulation, error)
-	FindByIdSetup(setupId string) (*entity.Setup, error)
-	FindByIdBorrower(borrwerId string) (*entity.Borrower, error)
-	UpdateSetup(setupId string, newSetup *entity.Setup) error
-	UpdateSimulation(simu *entity.Simulation) error
-	GetSimulations(param *model.Params) ([]entity.Simulation, error)
+	CreatedSimulation(simu *entity.Simulation, schema string) (*entity.Simulation, error)
+	CreatedBorrower(tom *entity.Borrower, schema string) error
+	CreatedSetup(set *entity.Setup, schema string) error
+	FindByIdSimulation(simulationId string, schema string) (*entity.Simulation, error)
+	FindByIdSetup(setupId string, schema string) (*entity.Setup, error)
+	FindByIdBorrower(borrwerId string, schema string) (*entity.Borrower, error)
+	UpdateSetup(setupId string, newSetup *entity.Setup, schema string) error
+	UpdateSimulation(simu *entity.Simulation, schema string) error
+	GetSimulations(param *model.Params, schema string) ([]entity.Simulation, error)
 	Ping() error
 }
 
@@ -52,7 +52,7 @@ func NewRepository(db *sql.DB, log logger.ILogCloudWatch) IRepository {
 	}
 }
 
-func (r *Repository) CreatedSimulation(simu *entity.Simulation) (*entity.Simulation, error) {
+func (r *Repository) CreatedSimulation(simu *entity.Simulation, schema string) (*entity.Simulation, error) {
 	var simula entity.Simulation
 
 	var SimulationId uuid.UUID
@@ -93,7 +93,7 @@ func (r *Repository) CreatedSimulation(simu *entity.Simulation) (*entity.Simulat
 
 }
 
-func (r *Repository) CreatedBorrower(tom *entity.Borrower) error {
+func (r *Repository) CreatedBorrower(tom *entity.Borrower, schema string) error {
 	query := `
 	INSERT INTO borrower ( name, phone, email, cpf,created_at, updated_at)
 	VALUES ($1, $2, $3, $4, NOW(), NOW())
@@ -105,7 +105,7 @@ func (r *Repository) CreatedBorrower(tom *entity.Borrower) error {
 	}
 	return nil
 }
-func (r *Repository) CreatedSetup(set *entity.Setup) error {
+func (r *Repository) CreatedSetup(set *entity.Setup, schema string) error {
 	set.Escope = "escope"
 	set.EscopeIsValid = true
 	query := `
@@ -122,7 +122,7 @@ func (r *Repository) CreatedSetup(set *entity.Setup) error {
 
 }
 
-func (r *Repository) UpdateSimulation(simu *entity.Simulation) error {
+func (r *Repository) UpdateSimulation(simu *entity.Simulation, schema string) error {
 
 	query := `
 		UPDATE simulations 
@@ -134,7 +134,7 @@ func (r *Repository) UpdateSimulation(simu *entity.Simulation) error {
 	return err
 }
 
-func (r *Repository) UpdateSetup(setupId string, newSetup *entity.Setup) error {
+func (r *Repository) UpdateSetup(setupId string, newSetup *entity.Setup, schema string) error {
 
 	query := `
 	UPDATE setup 
@@ -150,7 +150,7 @@ func (r *Repository) UpdateSetup(setupId string, newSetup *entity.Setup) error {
 	return nil
 }
 
-func (r *Repository) FindByIdSimulation(simulationId string) (*entity.Simulation, error) {
+func (r *Repository) FindByIdSimulation(simulationId string, schema string) (*entity.Simulation, error) {
 	simulation := entity.Simulation{}
 
 	query := `
@@ -179,7 +179,7 @@ func (r *Repository) FindByIdSimulation(simulationId string) (*entity.Simulation
 	return &simulation, nil
 
 }
-func (r *Repository) FindByIdSetup(setupId string) (*entity.Setup, error) {
+func (r *Repository) FindByIdSetup(setupId string, schema string) (*entity.Setup, error) {
 
 	if config, ok := tenantConfigCache.Load(setupId); ok {
 		return config.(*entity.Setup), nil
@@ -215,7 +215,7 @@ func (r *Repository) FindByIdSetup(setupId string) (*entity.Setup, error) {
 
 	return &setup, nil
 }
-func (r *Repository) FindByIdBorrower(borrwerId string) (*entity.Borrower, error) {
+func (r *Repository) FindByIdBorrower(borrwerId string, schema string) (*entity.Borrower, error) {
 
 	borrwer := entity.Borrower{}
 
@@ -246,7 +246,7 @@ func (r *Repository) FindByIdBorrower(borrwerId string) (*entity.Borrower, error
 
 }
 
-func (r *Repository) GetSimulations(param *model.Params) ([]entity.Simulation, error) {
+func (r *Repository) GetSimulations(param *model.Params, schema string) ([]entity.Simulation, error) {
 
 	offset := (param.Page - 1) * param.PageSize
 	var SimulationId uuid.UUID
@@ -283,14 +283,14 @@ func (r *Repository) GetSimulations(param *model.Params) ([]entity.Simulation, e
 		query += fmt.Sprintf(" AND number_of_installments = $%d", len(args)+1)
 		args = append(args, *param.Simu.NumberOfInstallments)
 	}
-	if ((param.Simu.CreatedAt != nil) && (*param.Simu.CreatedAt != time.Time{}) ){
+	if (param.Simu.CreatedAt != nil) && (*param.Simu.CreatedAt != time.Time{}) {
 		query += fmt.Sprintf(" AND created_at = $%d", len(args)+1)
 		args = append(args, *param.Simu.CreatedAt)
 	}
-	// if param.Simu.UpdatedAt != nil {
-	// 	query += fmt.Sprintf(" AND updated_at = $%d", len(args)+1)
-	// 	args = append(args, *param.Simu.UpdatedAt)
-	// }
+	if param.Simu.UpdatedAt != nil {
+		query += fmt.Sprintf(" AND updated_at = $%d", len(args)+1)
+		args = append(args, *param.Simu.UpdatedAt)
+	}
 
 	// Adiciona paginação
 	query += fmt.Sprintf(" ORDER BY created_at DESC LIMIT $%d OFFSET $%d", len(args)+1, len(args)+2)
@@ -307,9 +307,8 @@ func (r *Repository) GetSimulations(param *model.Params) ([]entity.Simulation, e
 	var simulations []entity.Simulation
 	for rows.Next() {
 
-		
 		var sim entity.Simulation
-		if err := rows.Scan(&SimulationId, &sim.BorrowerId,&sim.InterestRate, &sim.Status, &sim.LoanValue, &sim.NumberOfInstallments, &sim.CreatedAt, &sim.UpdatedAt); err != nil {
+		if err := rows.Scan(&SimulationId, &sim.BorrowerId, &sim.InterestRate, &sim.Status, &sim.LoanValue, &sim.NumberOfInstallments, &sim.CreatedAt, &sim.UpdatedAt); err != nil {
 			return nil, err
 		}
 		sim.SimulationId = SimulationId.String()

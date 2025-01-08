@@ -3,8 +3,29 @@ package handlres
 import (
 	"net/http"
 	service "project-golang/internal/services"
+	"reflect"
 	"testing"
 )
+
+func TestNewSimulationHandler(t *testing.T) {
+	type args struct {
+		serv service.ISimulationService
+	}
+	tests := []struct {
+		name string
+		args args
+		want ISimulationHandler
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := NewSimulationHandler(tt.args.serv); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NewSimulationHandler() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
 
 func TestSimulationHandler_FindSimulationsByParam(t *testing.T) {
 	type fields struct {
@@ -231,7 +252,7 @@ func TestSimulationHandler_UpdateSetup(t *testing.T) {
 	}
 }
 
-func TestSimulationHandler_UpdateSimulationStatus(t *testing.T) {
+func TestSimulationHandler_UpdateSimulation(t *testing.T) {
 	type fields struct {
 		service service.ISimulationService
 	}
@@ -302,6 +323,32 @@ func TestSimulationHandler_HealthCheckHandler(t *testing.T) {
 				service: tt.fields.service,
 			}
 			s.HealthCheckHandler(tt.args.w, tt.args.r)
+		})
+	}
+}
+
+func Test_extractToken(t *testing.T) {
+	type args struct {
+		r *http.Request
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    string
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := extractToken(tt.args.r)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("extractToken() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("extractToken() = %v, want %v", got, tt.want)
+			}
 		})
 	}
 }

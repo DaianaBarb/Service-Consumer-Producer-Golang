@@ -11,13 +11,13 @@ type IRepository struct {
 	mock.Mock
 }
 
-// CreatedBorrower provides a mock function with given fields: tom
-func (_m *IRepository) CreatedBorrower(tom *entity.Borrower) error {
-	ret := _m.Called(tom)
+// CreatedBorrower provides a mock function with given fields: tom, schema
+func (_m *IRepository) CreatedBorrower(tom *entity.Borrower, schema string) error {
+	ret := _m.Called(tom, schema)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(*entity.Borrower) error); ok {
-		r0 = rf(tom)
+	if rf, ok := ret.Get(0).(func(*entity.Borrower, string) error); ok {
+		r0 = rf(tom, schema)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -25,13 +25,13 @@ func (_m *IRepository) CreatedBorrower(tom *entity.Borrower) error {
 	return r0
 }
 
-// CreatedSetup provides a mock function with given fields: set
-func (_m *IRepository) CreatedSetup(set *entity.Setup) error {
-	ret := _m.Called(set)
+// CreatedSetup provides a mock function with given fields: set, schema
+func (_m *IRepository) CreatedSetup(set *entity.Setup, schema string) error {
+	ret := _m.Called(set, schema)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(*entity.Setup) error); ok {
-		r0 = rf(set)
+	if rf, ok := ret.Get(0).(func(*entity.Setup, string) error); ok {
+		r0 = rf(set, schema)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -39,13 +39,13 @@ func (_m *IRepository) CreatedSetup(set *entity.Setup) error {
 	return r0
 }
 
-// CreatedSimulation provides a mock function with given fields: simu
-func (_m *IRepository) CreatedSimulation(simu *entity.Simulation) (*entity.Simulation, error) {
-	ret := _m.Called(simu)
+// CreatedSimulation provides a mock function with given fields: simu, schema
+func (_m *IRepository) CreatedSimulation(simu *entity.Simulation, schema string) (*entity.Simulation, error) {
+	ret := _m.Called(simu, schema)
 
 	var r0 *entity.Simulation
-	if rf, ok := ret.Get(0).(func(*entity.Simulation) *entity.Simulation); ok {
-		r0 = rf(simu)
+	if rf, ok := ret.Get(0).(func(*entity.Simulation, string) *entity.Simulation); ok {
+		r0 = rf(simu, schema)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*entity.Simulation)
@@ -53,8 +53,8 @@ func (_m *IRepository) CreatedSimulation(simu *entity.Simulation) (*entity.Simul
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(*entity.Simulation) error); ok {
-		r1 = rf(simu)
+	if rf, ok := ret.Get(1).(func(*entity.Simulation, string) error); ok {
+		r1 = rf(simu, schema)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -62,13 +62,13 @@ func (_m *IRepository) CreatedSimulation(simu *entity.Simulation) (*entity.Simul
 	return r0, r1
 }
 
-// FindByIdBorrower provides a mock function with given fields: borrwerId
-func (_m *IRepository) FindByIdBorrower(borrwerId string) (*entity.Borrower, error) {
-	ret := _m.Called(borrwerId)
+// FindByIdBorrower provides a mock function with given fields: borrwerId, schema
+func (_m *IRepository) FindByIdBorrower(borrwerId string, schema string) (*entity.Borrower, error) {
+	ret := _m.Called(borrwerId, schema)
 
 	var r0 *entity.Borrower
-	if rf, ok := ret.Get(0).(func(string) *entity.Borrower); ok {
-		r0 = rf(borrwerId)
+	if rf, ok := ret.Get(0).(func(string, string) *entity.Borrower); ok {
+		r0 = rf(borrwerId, schema)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*entity.Borrower)
@@ -76,8 +76,8 @@ func (_m *IRepository) FindByIdBorrower(borrwerId string) (*entity.Borrower, err
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(string) error); ok {
-		r1 = rf(borrwerId)
+	if rf, ok := ret.Get(1).(func(string, string) error); ok {
+		r1 = rf(borrwerId, schema)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -85,13 +85,13 @@ func (_m *IRepository) FindByIdBorrower(borrwerId string) (*entity.Borrower, err
 	return r0, r1
 }
 
-// FindByIdSetup provides a mock function with given fields: setupId
-func (_m *IRepository) FindByIdSetup(setupId string) (*entity.Setup, error) {
-	ret := _m.Called(setupId)
+// FindByIdSetup provides a mock function with given fields: setupId, schema
+func (_m *IRepository) FindByIdSetup(setupId string, schema string) (*entity.Setup, error) {
+	ret := _m.Called(setupId, schema)
 
 	var r0 *entity.Setup
-	if rf, ok := ret.Get(0).(func(string) *entity.Setup); ok {
-		r0 = rf(setupId)
+	if rf, ok := ret.Get(0).(func(string, string) *entity.Setup); ok {
+		r0 = rf(setupId, schema)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*entity.Setup)
@@ -99,8 +99,8 @@ func (_m *IRepository) FindByIdSetup(setupId string) (*entity.Setup, error) {
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(string) error); ok {
-		r1 = rf(setupId)
+	if rf, ok := ret.Get(1).(func(string, string) error); ok {
+		r1 = rf(setupId, schema)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -108,13 +108,13 @@ func (_m *IRepository) FindByIdSetup(setupId string) (*entity.Setup, error) {
 	return r0, r1
 }
 
-// FindByIdSimulation provides a mock function with given fields: simulationId
-func (_m *IRepository) FindByIdSimulation(simulationId string) (*entity.Simulation, error) {
-	ret := _m.Called(simulationId)
+// FindByIdSimulation provides a mock function with given fields: simulationId, schema
+func (_m *IRepository) FindByIdSimulation(simulationId string, schema string) (*entity.Simulation, error) {
+	ret := _m.Called(simulationId, schema)
 
 	var r0 *entity.Simulation
-	if rf, ok := ret.Get(0).(func(string) *entity.Simulation); ok {
-		r0 = rf(simulationId)
+	if rf, ok := ret.Get(0).(func(string, string) *entity.Simulation); ok {
+		r0 = rf(simulationId, schema)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*entity.Simulation)
@@ -122,8 +122,8 @@ func (_m *IRepository) FindByIdSimulation(simulationId string) (*entity.Simulati
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(string) error); ok {
-		r1 = rf(simulationId)
+	if rf, ok := ret.Get(1).(func(string, string) error); ok {
+		r1 = rf(simulationId, schema)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -131,13 +131,13 @@ func (_m *IRepository) FindByIdSimulation(simulationId string) (*entity.Simulati
 	return r0, r1
 }
 
-// GetSimulations provides a mock function with given fields: param
-func (_m *IRepository) GetSimulations(param *model.Params) ([]entity.Simulation, error) {
-	ret := _m.Called(param)
+// GetSimulations provides a mock function with given fields: param, schema
+func (_m *IRepository) GetSimulations(param *model.Params, schema string) ([]entity.Simulation, error) {
+	ret := _m.Called(param, schema)
 
 	var r0 []entity.Simulation
-	if rf, ok := ret.Get(0).(func(*model.Params) []entity.Simulation); ok {
-		r0 = rf(param)
+	if rf, ok := ret.Get(0).(func(*model.Params, string) []entity.Simulation); ok {
+		r0 = rf(param, schema)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]entity.Simulation)
@@ -145,8 +145,8 @@ func (_m *IRepository) GetSimulations(param *model.Params) ([]entity.Simulation,
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(*model.Params) error); ok {
-		r1 = rf(param)
+	if rf, ok := ret.Get(1).(func(*model.Params, string) error); ok {
+		r1 = rf(param, schema)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -168,13 +168,13 @@ func (_m *IRepository) Ping() error {
 	return r0
 }
 
-// UpdateSetup provides a mock function with given fields: setupId, newSetup
-func (_m *IRepository) UpdateSetup(setupId string, newSetup *entity.Setup) error {
-	ret := _m.Called(setupId, newSetup)
+// UpdateSetup provides a mock function with given fields: setupId, newSetup, schema
+func (_m *IRepository) UpdateSetup(setupId string, newSetup *entity.Setup, schema string) error {
+	ret := _m.Called(setupId, newSetup, schema)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(string, *entity.Setup) error); ok {
-		r0 = rf(setupId, newSetup)
+	if rf, ok := ret.Get(0).(func(string, *entity.Setup, string) error); ok {
+		r0 = rf(setupId, newSetup, schema)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -182,13 +182,13 @@ func (_m *IRepository) UpdateSetup(setupId string, newSetup *entity.Setup) error
 	return r0
 }
 
-// UpdateSimulationStatus provides a mock function with given fields: simulationId, status
-func (_m *IRepository) UpdateSimulationStatus(simulationId string, status string) error {
-	ret := _m.Called(simulationId, status)
+// UpdateSimulation provides a mock function with given fields: simu, schema
+func (_m *IRepository) UpdateSimulation(simu *entity.Simulation, schema string) error {
+	ret := _m.Called(simu, schema)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(string, string) error); ok {
-		r0 = rf(simulationId, status)
+	if rf, ok := ret.Get(0).(func(*entity.Simulation, string) error); ok {
+		r0 = rf(simu, schema)
 	} else {
 		r0 = ret.Error(0)
 	}

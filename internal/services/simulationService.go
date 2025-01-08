@@ -24,18 +24,18 @@ import (
 var SecretKey = []byte("chave_secreta_")
 
 type ISimulationService interface {
-	CreatedSimulation(ctx context.Context, simu *model.Simulation, token *jwt.Token) error
-	CreatedBorrower(tom *model.Borrower) error
-	CreatedSetup(set *model.Setup) error
-	FindByIdSimulation(simulationId string) (*model.Simulation, error)
-	FindByIdSetup(setupId string) (*model.Setup, error)
-	FindByIdBorrower(borrwerId string) (*model.Borrower, error)
-	UpdateSetup(newSetup *model.Setup) error
-	UpdateSimulation(*model.Simulation) error
-	SimulationResponseBorrower(id string, response *model.SimulationResponseBorrower) error
+	CreatedSimulation(ctx context.Context, simu *model.Simulation, token *jwt.Token, schema string) error
+	CreatedBorrower(tom *model.Borrower, schema string) error
+	CreatedSetup(set *model.Setup, schema string) error
+	FindByIdSimulation(simulationId string, schema string) (*model.Simulation, error)
+	FindByIdSetup(setupId string, schema string) (*model.Setup, error)
+	FindByIdBorrower(borrwerId string, schema string) (*model.Borrower, error)
+	UpdateSetup(newSetup *model.Setup, schema string) error
+	UpdateSimulation(m *model.Simulation, schema string) error
+	SimulationResponseBorrower(id string, response *model.SimulationResponseBorrower, schema string) error
 	GenerateJWT(payload model.PayloadJWT) (string, error)
 	TokenIsValid(tokenString string) (*jwt.Token, error)
-	FindByParamSimulations(param *model.Params) (*dto.SimulationPaginationResponse, error)
+	FindByParamSimulations(param *model.Params, schema string) (*dto.SimulationPaginationResponse, error)
 
 	Ping() error
 }
@@ -47,8 +47,8 @@ type SimulationService struct {
 }
 
 // FindByParamSimulations implements ISimulationService.
-func (s *SimulationService) FindByParamSimulations(param *model.Params) (*dto.SimulationPaginationResponse, error) {
-	simulations, err := s.repository.GetSimulations(param)
+func (s *SimulationService) FindByParamSimulations(param *model.Params, schema string) (*dto.SimulationPaginationResponse, error) {
+	simulations, err := s.repository.GetSimulations(param, schema)
 	if err != nil {
 		return nil, err
 	}
@@ -64,13 +64,13 @@ func NewSimulationService(repo repository.IRepository, sqs sqsAws.Client, anti a
 }
 
 // SimulationResponseBorrower implements ISimulationService.
-func (s *SimulationService) SimulationResponseBorrower(id string, response *model.SimulationResponseBorrower) error {
+func (s *SimulationService) SimulationResponseBorrower(id string, response *model.SimulationResponseBorrower, schema string) error {
 
 	newSimu := &entity.Simulation{SimulationId: response.SimulationId,
 		Status: response.Status}
 	// persistir no banco o status e enviar pra fila
 
-	err := s.repository.UpdateSimulation(newSimu)
+	err := s.repository.UpdateSimulation(newSimu, schema)
 	if err != nil {
 		return err
 	}
@@ -83,17 +83,17 @@ func (s *SimulationService) SimulationResponseBorrower(id string, response *mode
 }
 
 // CreatedBorrower implements ISimulationService.
-func (s *SimulationService) CreatedBorrower(tom *model.Borrower) error {
-	return s.repository.CreatedBorrower(model.ToBorrowerEntity(tom))
+func (s *SimulationService) CreatedBorrower(tom *model.Borrower, schema string) error {
+	return s.repository.CreatedBorrower(model.ToBorrowerEntity(tom), schema)
 }
 
 // CreatedSetup implements ISimulationService.
-func (s *SimulationService) CreatedSetup(set *model.Setup) error {
-	return s.repository.CreatedSetup(model.ToSetupEntity(set))
+func (s *SimulationService) CreatedSetup(set *model.Setup, schema string) error {
+	return s.repository.CreatedSetup(model.ToSetupEntity(set), schema)
 }
 
 // CreatedSimulation implements ISimulationService.
-func (s *SimulationService) CreatedSimulation(ctx context.Context, simu *model.Simulation, token *jwt.Token) error {
+func (s *SimulationService) CreatedSimulation(ctx context.Context, simu *model.Simulation, token *jwt.Token, schema string) error {
 
 	//verificar fraude
 	// o token ja e validado no handler
@@ -110,7 +110,7 @@ func (s *SimulationService) CreatedSimulation(ctx context.Context, simu *model.S
 		return err
 	}
 
-	setup, err := s.repository.FindByIdSetup(os.Getenv("SETUP_ID"))
+	setup, err := s.repository.FindByIdSetup(os.Getenv("SETUP_ID"), schema)
 	if err != nil {
 		return err
 	}
@@ -127,7 +127,7 @@ func (s *SimulationService) CreatedSimulation(ctx context.Context, simu *model.S
 	simu.InterestRate = juros
 	simu.Status = "CREATED"
 
-	newSimu, err := s.repository.CreatedSimulation(model.ToSimulationEntity(simu))
+	newSimu, err := s.repository.CreatedSimulation(model.ToSimulationEntity(simu), schema)
 	if err != nil {
 		return err
 	}
@@ -142,8 +142,8 @@ func (s *SimulationService) CreatedSimulation(ctx context.Context, simu *model.S
 }
 
 // FindByIdBorrower implements ISimulationService.
-func (s *SimulationService) FindByIdBorrower(borrwerId string) (*model.Borrower, error) {
-	bo, err := s.repository.FindByIdBorrower(borrwerId)
+func (s *SimulationService) FindByIdBorrower(borrwerId string, schema string) (*model.Borrower, error) {
+	bo, err := s.repository.FindByIdBorrower(borrwerId, schema)
 	if err != nil {
 		return nil, err
 	}
@@ -155,8 +155,8 @@ func (s *SimulationService) FindByIdBorrower(borrwerId string) (*model.Borrower,
 }
 
 // FindByIdSetup implements ISimulationService.
-func (s *SimulationService) FindByIdSetup(setupId string) (*model.Setup, error) {
-	set, err := s.repository.FindByIdSetup(setupId)
+func (s *SimulationService) FindByIdSetup(setupId string, schema string) (*model.Setup, error) {
+	set, err := s.repository.FindByIdSetup(setupId, schema)
 
 	if err != nil {
 
@@ -168,8 +168,8 @@ func (s *SimulationService) FindByIdSetup(setupId string) (*model.Setup, error) 
 }
 
 // FindByIdSimulation implements ISimulationService.
-func (s *SimulationService) FindByIdSimulation(simulationId string) (*model.Simulation, error) {
-	simula, err := s.repository.FindByIdSimulation(simulationId)
+func (s *SimulationService) FindByIdSimulation(simulationId string, schema string) (*model.Simulation, error) {
+	simula, err := s.repository.FindByIdSimulation(simulationId, schema)
 	if err != nil {
 		return nil, err
 	}
@@ -182,14 +182,14 @@ func (s *SimulationService) FindByIdSimulation(simulationId string) (*model.Simu
 }
 
 // UpdateSetup implements ISimulationService.
-func (s *SimulationService) UpdateSetup(newSetup *model.Setup) error {
+func (s *SimulationService) UpdateSetup(newSetup *model.Setup, schema string) error {
 
 	escope, err := s.theScopeIsValid(newSetup.Escope)
 	if err != nil {
 		return err
 	}
 	if escope {
-		return s.repository.UpdateSetup(os.ExpandEnv("SETUP_ID"), model.ToSetupEntity(newSetup))
+		return s.repository.UpdateSetup(os.ExpandEnv("SETUP_ID"), model.ToSetupEntity(newSetup), schema)
 
 	}
 	return errors.New("escopo invalido")
@@ -197,14 +197,14 @@ func (s *SimulationService) UpdateSetup(newSetup *model.Setup) error {
 }
 
 // UpdateSimulationStatus implements ISimulationService.
-func (s *SimulationService) UpdateSimulation(m *model.Simulation) error {
+func (s *SimulationService) UpdateSimulation(m *model.Simulation, schema string) error {
 	simu := &entity.Simulation{SimulationId: m.SimulationId,
 		Status:               m.Status,
 		BorrowerId:           m.BorrowerId,
 		LoanValue:            m.LoanValue,
 		NumberOfInstallments: m.NumberOfInstallments,
 		InterestRate:         m.InterestRate}
-	return s.repository.UpdateSimulation(simu)
+	return s.repository.UpdateSimulation(simu, schema)
 }
 
 func (s *SimulationService) checkAntiFraude(request *dto.AntiFraudRequest) (*dto.AntiFraudResponse, error) {

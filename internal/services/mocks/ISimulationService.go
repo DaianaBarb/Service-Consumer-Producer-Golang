@@ -13,13 +13,13 @@ type ISimulationService struct {
 	mock.Mock
 }
 
-// CreatedBorrower provides a mock function with given fields: tom
-func (_m *ISimulationService) CreatedBorrower(tom *model.Borrower) error {
-	ret := _m.Called(tom)
+// CreatedBorrower provides a mock function with given fields: tom, schema
+func (_m *ISimulationService) CreatedBorrower(tom *model.Borrower, schema string) error {
+	ret := _m.Called(tom, schema)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(*model.Borrower) error); ok {
-		r0 = rf(tom)
+	if rf, ok := ret.Get(0).(func(*model.Borrower, string) error); ok {
+		r0 = rf(tom, schema)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -27,13 +27,13 @@ func (_m *ISimulationService) CreatedBorrower(tom *model.Borrower) error {
 	return r0
 }
 
-// CreatedSetup provides a mock function with given fields: set
-func (_m *ISimulationService) CreatedSetup(set *model.Setup) error {
-	ret := _m.Called(set)
+// CreatedSetup provides a mock function with given fields: set, schema
+func (_m *ISimulationService) CreatedSetup(set *model.Setup, schema string) error {
+	ret := _m.Called(set, schema)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(*model.Setup) error); ok {
-		r0 = rf(set)
+	if rf, ok := ret.Get(0).(func(*model.Setup, string) error); ok {
+		r0 = rf(set, schema)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -41,13 +41,13 @@ func (_m *ISimulationService) CreatedSetup(set *model.Setup) error {
 	return r0
 }
 
-// CreatedSimulation provides a mock function with given fields: ctx, simu, token
-func (_m *ISimulationService) CreatedSimulation(ctx context.Context, simu *model.Simulation, token *jwt.Token) error {
-	ret := _m.Called(ctx, simu, token)
+// CreatedSimulation provides a mock function with given fields: ctx, simu, token, schema
+func (_m *ISimulationService) CreatedSimulation(ctx context.Context, simu *model.Simulation, token *jwt.Token, schema string) error {
+	ret := _m.Called(ctx, simu, token, schema)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, *model.Simulation, *jwt.Token) error); ok {
-		r0 = rf(ctx, simu, token)
+	if rf, ok := ret.Get(0).(func(context.Context, *model.Simulation, *jwt.Token, string) error); ok {
+		r0 = rf(ctx, simu, token, schema)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -55,13 +55,13 @@ func (_m *ISimulationService) CreatedSimulation(ctx context.Context, simu *model
 	return r0
 }
 
-// FindByIdBorrower provides a mock function with given fields: borrwerId
-func (_m *ISimulationService) FindByIdBorrower(borrwerId string) (*model.Borrower, error) {
-	ret := _m.Called(borrwerId)
+// FindByIdBorrower provides a mock function with given fields: borrwerId, schema
+func (_m *ISimulationService) FindByIdBorrower(borrwerId string, schema string) (*model.Borrower, error) {
+	ret := _m.Called(borrwerId, schema)
 
 	var r0 *model.Borrower
-	if rf, ok := ret.Get(0).(func(string) *model.Borrower); ok {
-		r0 = rf(borrwerId)
+	if rf, ok := ret.Get(0).(func(string, string) *model.Borrower); ok {
+		r0 = rf(borrwerId, schema)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*model.Borrower)
@@ -69,8 +69,8 @@ func (_m *ISimulationService) FindByIdBorrower(borrwerId string) (*model.Borrowe
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(string) error); ok {
-		r1 = rf(borrwerId)
+	if rf, ok := ret.Get(1).(func(string, string) error); ok {
+		r1 = rf(borrwerId, schema)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -78,13 +78,13 @@ func (_m *ISimulationService) FindByIdBorrower(borrwerId string) (*model.Borrowe
 	return r0, r1
 }
 
-// FindByIdSetup provides a mock function with given fields: setupId
-func (_m *ISimulationService) FindByIdSetup(setupId string) (*model.Setup, error) {
-	ret := _m.Called(setupId)
+// FindByIdSetup provides a mock function with given fields: setupId, schema
+func (_m *ISimulationService) FindByIdSetup(setupId string, schema string) (*model.Setup, error) {
+	ret := _m.Called(setupId, schema)
 
 	var r0 *model.Setup
-	if rf, ok := ret.Get(0).(func(string) *model.Setup); ok {
-		r0 = rf(setupId)
+	if rf, ok := ret.Get(0).(func(string, string) *model.Setup); ok {
+		r0 = rf(setupId, schema)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*model.Setup)
@@ -92,8 +92,8 @@ func (_m *ISimulationService) FindByIdSetup(setupId string) (*model.Setup, error
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(string) error); ok {
-		r1 = rf(setupId)
+	if rf, ok := ret.Get(1).(func(string, string) error); ok {
+		r1 = rf(setupId, schema)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -101,13 +101,13 @@ func (_m *ISimulationService) FindByIdSetup(setupId string) (*model.Setup, error
 	return r0, r1
 }
 
-// FindByIdSimulation provides a mock function with given fields: simulationId
-func (_m *ISimulationService) FindByIdSimulation(simulationId string) (*model.Simulation, error) {
-	ret := _m.Called(simulationId)
+// FindByIdSimulation provides a mock function with given fields: simulationId, schema
+func (_m *ISimulationService) FindByIdSimulation(simulationId string, schema string) (*model.Simulation, error) {
+	ret := _m.Called(simulationId, schema)
 
 	var r0 *model.Simulation
-	if rf, ok := ret.Get(0).(func(string) *model.Simulation); ok {
-		r0 = rf(simulationId)
+	if rf, ok := ret.Get(0).(func(string, string) *model.Simulation); ok {
+		r0 = rf(simulationId, schema)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*model.Simulation)
@@ -115,8 +115,8 @@ func (_m *ISimulationService) FindByIdSimulation(simulationId string) (*model.Si
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(string) error); ok {
-		r1 = rf(simulationId)
+	if rf, ok := ret.Get(1).(func(string, string) error); ok {
+		r1 = rf(simulationId, schema)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -124,20 +124,22 @@ func (_m *ISimulationService) FindByIdSimulation(simulationId string) (*model.Si
 	return r0, r1
 }
 
-// FindByParamSimulations provides a mock function with given fields: param
-func (_m *ISimulationService) FindByParamSimulations(param *model.Params) (dto.SimulationPaginationResponse, error) {
-	ret := _m.Called(param)
+// FindByParamSimulations provides a mock function with given fields: param, schema
+func (_m *ISimulationService) FindByParamSimulations(param *model.Params, schema string) (*dto.SimulationPaginationResponse, error) {
+	ret := _m.Called(param, schema)
 
-	var r0 dto.SimulationPaginationResponse
-	if rf, ok := ret.Get(0).(func(*model.Params) dto.SimulationPaginationResponse); ok {
-		r0 = rf(param)
+	var r0 *dto.SimulationPaginationResponse
+	if rf, ok := ret.Get(0).(func(*model.Params, string) *dto.SimulationPaginationResponse); ok {
+		r0 = rf(param, schema)
 	} else {
-		r0 = ret.Get(0).(dto.SimulationPaginationResponse)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*dto.SimulationPaginationResponse)
+		}
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(*model.Params) error); ok {
-		r1 = rf(param)
+	if rf, ok := ret.Get(1).(func(*model.Params, string) error); ok {
+		r1 = rf(param, schema)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -180,13 +182,13 @@ func (_m *ISimulationService) Ping() error {
 	return r0
 }
 
-// SimulationResponseBorrower provides a mock function with given fields: response
-func (_m *ISimulationService) SimulationResponseBorrower(response *model.SimulationResponseBorrower) error {
-	ret := _m.Called(response)
+// SimulationResponseBorrower provides a mock function with given fields: id, response, schema
+func (_m *ISimulationService) SimulationResponseBorrower(id string, response *model.SimulationResponseBorrower, schema string) error {
+	ret := _m.Called(id, response, schema)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(*model.SimulationResponseBorrower) error); ok {
-		r0 = rf(response)
+	if rf, ok := ret.Get(0).(func(string, *model.SimulationResponseBorrower, string) error); ok {
+		r0 = rf(id, response, schema)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -217,13 +219,13 @@ func (_m *ISimulationService) TokenIsValid(tokenString string) (*jwt.Token, erro
 	return r0, r1
 }
 
-// UpdateSetup provides a mock function with given fields: setupId, newSetup
-func (_m *ISimulationService) UpdateSetup(setupId string, newSetup *model.Setup) error {
-	ret := _m.Called(setupId, newSetup)
+// UpdateSetup provides a mock function with given fields: newSetup, schema
+func (_m *ISimulationService) UpdateSetup(newSetup *model.Setup, schema string) error {
+	ret := _m.Called(newSetup, schema)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(string, *model.Setup) error); ok {
-		r0 = rf(setupId, newSetup)
+	if rf, ok := ret.Get(0).(func(*model.Setup, string) error); ok {
+		r0 = rf(newSetup, schema)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -231,13 +233,13 @@ func (_m *ISimulationService) UpdateSetup(setupId string, newSetup *model.Setup)
 	return r0
 }
 
-// UpdateSimulationStatus provides a mock function with given fields: simulationId, status
-func (_m *ISimulationService) UpdateSimulationStatus(simulationId string, status string) error {
-	ret := _m.Called(simulationId, status)
+// UpdateSimulation provides a mock function with given fields: m, schema
+func (_m *ISimulationService) UpdateSimulation(m *model.Simulation, schema string) error {
+	ret := _m.Called(m, schema)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(string, string) error); ok {
-		r0 = rf(simulationId, status)
+	if rf, ok := ret.Get(0).(func(*model.Simulation, string) error); ok {
+		r0 = rf(m, schema)
 	} else {
 		r0 = ret.Error(0)
 	}

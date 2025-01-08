@@ -80,13 +80,21 @@ func NewSimulationHandler(serv service.ISimulationService) ISimulationHandler {
 func (s *SimulationHandler) FindSimulationsByParam(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
 	ctx = context.WithValue(ctx, "generatJWT", r.Header.Get("X-User"))
-	user := r.Header.Get("X-User")
+	user := r.Header.Get("X-user-ID")
+	tenant := r.Header.Get("X-tenant-ID")
 	w.Header().Set("Content-Type", "application/json")
 
 	if len(user) == 0 || user == "" {
 
 		// fazer log user invalid
-		utils.ErrorResponse(w, errors.BadRequestf("header X-User not exists"))
+		utils.ErrorResponse(w, errors.BadRequestf("header X-user-ID not exists"))
+		return
+	}
+
+	if len(tenant) == 0 || tenant == "" {
+
+		// fazer log user invalid
+		utils.ErrorResponse(w, errors.BadRequestf("header X-tenant-ID not exists"))
 		return
 	}
 
@@ -133,7 +141,7 @@ func (s *SimulationHandler) FindSimulationsByParam(w http.ResponseWriter, r *htt
 		},
 		Page:     page,
 		PageSize: pageSize,
-	})
+	}, tenant)
 	if err != nil {
 		utils.ErrorResponse(w, errors.Internalf("request error: %v", err))
 		return
@@ -156,14 +164,16 @@ func (s *SimulationHandler) GenerateJWTw(w http.ResponseWriter, r *http.Request)
 	ctx := context.Background()
 	ctx = context.WithValue(ctx, "generatJWT", r.Header.Get("X-User"))
 	user := r.Header.Get("X-User")
+
 	w.Header().Set("Content-Type", "application/json")
 
 	if len(user) == 0 || user == "" {
 
 		// fazer log user invalid
-		utils.ErrorResponse(w, errors.BadRequestf("header X-User not exists"))
+		utils.ErrorResponse(w, errors.BadRequestf("header X-user-ID not exists"))
 		return
 	}
+
 	request := dto.JwtRequest{}
 
 	err := json.NewDecoder(r.Body).Decode(&request)
@@ -206,15 +216,22 @@ func (s *SimulationHandler) CreatedBorrower(w http.ResponseWriter, r *http.Reque
 	ctx := context.Background()
 	ctx = context.WithValue(ctx, "generatJWT", r.Header.Get("X-User"))
 	user := r.Header.Get("X-User")
+	tenant := r.Header.Get("X-tenant-ID")
 	w.Header().Set("Content-Type", "application/json")
 
 	if len(user) == 0 || user == "" {
 
 		// fazer log user invalid
-		utils.ErrorResponse(w, errors.BadRequestf("header X-User not exists"))
+		utils.ErrorResponse(w, errors.BadRequestf("header X-user-ID not exists"))
 		return
 	}
 
+	if len(tenant) == 0 || tenant == "" {
+
+		// fazer log user invalid
+		utils.ErrorResponse(w, errors.BadRequestf("header X-tenant-ID not exists"))
+		return
+	}
 	token, err := extractToken(r)
 	if err != nil {
 
@@ -244,7 +261,7 @@ func (s *SimulationHandler) CreatedBorrower(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	err = s.service.CreatedBorrower(dto.ToBorrowerModel(&request))
+	err = s.service.CreatedBorrower(dto.ToBorrowerModel(&request), tenant)
 
 	if err != nil {
 		//logar error
@@ -269,12 +286,20 @@ func (s *SimulationHandler) CreatedSetup(w http.ResponseWriter, r *http.Request)
 	ctx := context.Background()
 	ctx = context.WithValue(ctx, "generatJWT", r.Header.Get("X-User"))
 	user := r.Header.Get("X-User")
+	tenant := r.Header.Get("X-tenant-ID")
 	w.Header().Set("Content-Type", "application/json")
 
 	if len(user) == 0 || user == "" {
 
 		// fazer log user invalid
-		utils.ErrorResponse(w, errors.BadRequestf("header X-User not exists"))
+		utils.ErrorResponse(w, errors.BadRequestf("header X-user-ID not exists"))
+		return
+	}
+
+	if len(tenant) == 0 || tenant == "" {
+
+		// fazer log user invalid
+		utils.ErrorResponse(w, errors.BadRequestf("header X-tenant-ID not exists"))
 		return
 	}
 
@@ -307,7 +332,7 @@ func (s *SimulationHandler) CreatedSetup(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	err = s.service.CreatedSetup(dto.ToSetupModel(&request))
+	err = s.service.CreatedSetup(dto.ToSetupModel(&request), tenant)
 
 	if err != nil {
 		//logar error
@@ -330,15 +355,22 @@ func (s *SimulationHandler) CreatedSimulation(w http.ResponseWriter, r *http.Req
 	ctx := context.Background()
 	ctx = context.WithValue(ctx, "generatJWT", r.Header.Get("X-User"))
 	user := r.Header.Get("X-User")
+	tenant := r.Header.Get("X-tenant-ID")
 	w.Header().Set("Content-Type", "application/json")
 
 	if len(user) == 0 || user == "" {
 
 		// fazer log user invalid
-		utils.ErrorResponse(w, errors.BadRequestf("header X-User not exists"))
+		utils.ErrorResponse(w, errors.BadRequestf("header X-user-ID not exists"))
 		return
 	}
 
+	if len(tenant) == 0 || tenant == "" {
+
+		// fazer log user invalid
+		utils.ErrorResponse(w, errors.BadRequestf("header X-tenant-ID not exists"))
+		return
+	}
 	token, err := extractToken(r)
 	if err != nil {
 
@@ -369,7 +401,7 @@ func (s *SimulationHandler) CreatedSimulation(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	err = s.service.CreatedSimulation(ctx, dto.ToSimulationModel(&request), tokenJwt)
+	err = s.service.CreatedSimulation(ctx, dto.ToSimulationModel(&request), tokenJwt, tenant)
 
 	if err != nil {
 		//logar error
@@ -405,15 +437,22 @@ func (s *SimulationHandler) FindByIdBorrower(w http.ResponseWriter, r *http.Requ
 	ctx := context.Background()
 	ctx = context.WithValue(ctx, "generatJWT", r.Header.Get("X-User"))
 	user := r.Header.Get("X-User")
+	tenant := r.Header.Get("X-tenant-ID")
 	w.Header().Set("Content-Type", "application/json")
 
 	if len(user) == 0 || user == "" {
 
 		// fazer log user invalid
-		utils.ErrorResponse(w, errors.BadRequestf("header X-User not exists"))
+		utils.ErrorResponse(w, errors.BadRequestf("header X-user-ID not exists"))
 		return
 	}
 
+	if len(tenant) == 0 || tenant == "" {
+
+		// fazer log user invalid
+		utils.ErrorResponse(w, errors.BadRequestf("header X-tenant-ID not exists"))
+		return
+	}
 	token, err := extractToken(r)
 	if err != nil {
 
@@ -436,7 +475,7 @@ func (s *SimulationHandler) FindByIdBorrower(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	borrower, err := s.service.FindByIdBorrower(id)
+	borrower, err := s.service.FindByIdBorrower(id, tenant)
 	if err != nil {
 
 		utils.ErrorResponse(w, errors.Internalf("error to parser query params: %v", err))
@@ -481,12 +520,20 @@ func (s *SimulationHandler) FindByIdSetup(w http.ResponseWriter, r *http.Request
 	ctx := context.Background()
 	ctx = context.WithValue(ctx, "generatJWT", r.Header.Get("X-User"))
 	user := r.Header.Get("X-User")
+	tenant := r.Header.Get("X-tenant-ID")
 	w.Header().Set("Content-Type", "application/json")
 
 	if len(user) == 0 || user == "" {
 
 		// fazer log user invalid
-		utils.ErrorResponse(w, errors.BadRequestf("header X-User not exists"))
+		utils.ErrorResponse(w, errors.BadRequestf("header X-user-ID not exists"))
+		return
+	}
+
+	if len(tenant) == 0 || tenant == "" {
+
+		// fazer log user invalid
+		utils.ErrorResponse(w, errors.BadRequestf("header X-tenant-ID not exists"))
 		return
 	}
 
@@ -512,7 +559,7 @@ func (s *SimulationHandler) FindByIdSetup(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	setup, err := s.service.FindByIdSetup(id)
+	setup, err := s.service.FindByIdSetup(id, tenant)
 	if err != nil {
 
 		utils.ErrorResponse(w, errors.Internalf("error to parser query params: %v", err))
@@ -555,15 +602,22 @@ func (s *SimulationHandler) FindByIdSimulation(w http.ResponseWriter, r *http.Re
 	ctx := context.Background()
 	ctx = context.WithValue(ctx, "generatJWT", r.Header.Get("X-User"))
 	user := r.Header.Get("X-User")
+	tenant := r.Header.Get("X-tenant-ID")
 	w.Header().Set("Content-Type", "application/json")
 
 	if len(user) == 0 || user == "" {
 
 		// fazer log user invalid
-		utils.ErrorResponse(w, errors.BadRequestf("header X-User not exists"))
+		utils.ErrorResponse(w, errors.BadRequestf("header X-user-ID not exists"))
 		return
 	}
 
+	if len(tenant) == 0 || tenant == "" {
+
+		// fazer log user invalid
+		utils.ErrorResponse(w, errors.BadRequestf("header X-tenant-ID not exists"))
+		return
+	}
 	token, err := extractToken(r)
 	if err != nil {
 
@@ -586,7 +640,7 @@ func (s *SimulationHandler) FindByIdSimulation(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	simu, err := s.service.FindByIdSimulation(id)
+	simu, err := s.service.FindByIdSimulation(id, tenant)
 	if err != nil {
 
 		utils.ErrorResponse(w, errors.Internalf("error to parser query params: %v", err))
@@ -617,12 +671,20 @@ func (s *SimulationHandler) UpdateSetup(w http.ResponseWriter, r *http.Request) 
 	ctx := context.Background()
 	ctx = context.WithValue(ctx, "generatJWT", r.Header.Get("X-User"))
 	user := r.Header.Get("X-User")
+	tenant := r.Header.Get("X-tenant-ID")
 	w.Header().Set("Content-Type", "application/json")
 
 	if len(user) == 0 || user == "" {
 
 		// fazer log user invalid
-		utils.ErrorResponse(w, errors.BadRequestf("header X-User not exists"))
+		utils.ErrorResponse(w, errors.BadRequestf("header X-user-ID not exists"))
+		return
+	}
+
+	if len(tenant) == 0 || tenant == "" {
+
+		// fazer log user invalid
+		utils.ErrorResponse(w, errors.BadRequestf("header X-tenant-ID not exists"))
 		return
 	}
 
@@ -659,7 +721,7 @@ func (s *SimulationHandler) UpdateSetup(w http.ResponseWriter, r *http.Request) 
 		Fees:         newSetup.Fees,
 		InterestRate: newSetup.InterestRate,
 		Escope:       newSetup.Escope,
-	})
+	}, tenant)
 	if err != nil {
 
 		utils.ErrorResponse(w, errors.Internalf("error to parser query params: %v", err))
@@ -682,12 +744,20 @@ func (s *SimulationHandler) UpdateSimulation(w http.ResponseWriter, r *http.Requ
 	ctx := context.Background()
 	ctx = context.WithValue(ctx, "generatJWT", r.Header.Get("X-User"))
 	user := r.Header.Get("X-User")
+	tenant := r.Header.Get("X-tenant-ID")
 	w.Header().Set("Content-Type", "application/json")
 
 	if len(user) == 0 || user == "" {
 
 		// fazer log user invalid
-		utils.ErrorResponse(w, errors.BadRequestf("header X-User not exists"))
+		utils.ErrorResponse(w, errors.BadRequestf("header X-user-ID not exists"))
+		return
+	}
+
+	if len(tenant) == 0 || tenant == "" {
+
+		// fazer log user invalid
+		utils.ErrorResponse(w, errors.BadRequestf("header X-tenant-ID not exists"))
 		return
 	}
 	vars := mux.Vars(r)
@@ -739,7 +809,7 @@ func (s *SimulationHandler) UpdateSimulation(w http.ResponseWriter, r *http.Requ
 		LoanValue:            newSimu.LoanValue,
 		NumberOfInstallments: newSimu.NumberOfInstallments,
 		InterestRate:         newSimu.InterestRate,
-	})
+	}, tenant)
 	if err != nil {
 
 		utils.ErrorResponse(w, errors.Internalf("error to parser query params: %v", err))
@@ -761,12 +831,20 @@ func (s *SimulationHandler) BorrowerResponseToSimulation(w http.ResponseWriter, 
 	ctx := context.Background()
 	ctx = context.WithValue(ctx, "generatJWT", r.Header.Get("X-User"))
 	user := r.Header.Get("X-User")
+	tenant := r.Header.Get("X-tenant-ID")
 	w.Header().Set("Content-Type", "application/json")
 
 	if len(user) == 0 || user == "" {
 
 		// fazer log user invalid
-		utils.ErrorResponse(w, errors.BadRequestf("header X-User not exists"))
+		utils.ErrorResponse(w, errors.BadRequestf("header X-user-ID not exists"))
+		return
+	}
+
+	if len(tenant) == 0 || tenant == "" {
+
+		// fazer log user invalid
+		utils.ErrorResponse(w, errors.BadRequestf("header X-tenant-ID not exists"))
 		return
 	}
 	vars := mux.Vars(r)
@@ -814,7 +892,7 @@ func (s *SimulationHandler) BorrowerResponseToSimulation(w http.ResponseWriter, 
 	}
 
 	err = s.service.SimulationResponseBorrower(id, &model.SimulationResponseBorrower{
-		Status: request.Status})
+		Status: request.Status}, tenant)
 
 	if err != nil {
 		//logar error

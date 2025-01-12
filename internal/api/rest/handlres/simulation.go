@@ -261,6 +261,13 @@ func (s *SimulationHandler) CreatedBorrower(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
+	error = utils.Validate(request)
+	if error != nil {
+		//logar error
+		utils.ErrorResponse(w, errors.BadRequestf("bad request error: %v", err))
+		return
+	}
+
 	err = s.service.CreatedBorrower(dto.ToBorrowerModel(&request), tenant)
 
 	if err != nil {
@@ -331,6 +338,12 @@ func (s *SimulationHandler) CreatedSetup(w http.ResponseWriter, r *http.Request)
 		utils.ErrorResponse(w, errors.BadRequestf("bad request error: %v", err))
 		return
 	}
+	error = utils.Validate(request)
+	if error != nil {
+		//logar error
+		utils.ErrorResponse(w, errors.BadRequestf("bad request error: %v", err))
+		return
+	}
 
 	err = s.service.CreatedSetup(dto.ToSetupModel(&request), tenant)
 
@@ -395,6 +408,12 @@ func (s *SimulationHandler) CreatedSimulation(w http.ResponseWriter, r *http.Req
 	}
 
 	error := utils.ValidateStruct(request)
+	if error != nil {
+		//logar error
+		utils.ErrorResponse(w, errors.BadRequestf("bad request error: %v", err))
+		return
+	}
+	error = utils.Validate(request)
 	if error != nil {
 		//logar error
 		utils.ErrorResponse(w, errors.BadRequestf("bad request error: %v", err))
@@ -478,7 +497,7 @@ func (s *SimulationHandler) FindByIdBorrower(w http.ResponseWriter, r *http.Requ
 	borrower, err := s.service.FindByIdBorrower(id, tenant)
 	if err != nil {
 
-		utils.ErrorResponse(w, errors.Internalf("error to parser query params: %v", err))
+		utils.ErrorResponse(w, err)
 		return
 	}
 
@@ -562,7 +581,7 @@ func (s *SimulationHandler) FindByIdSetup(w http.ResponseWriter, r *http.Request
 	setup, err := s.service.FindByIdSetup(id, tenant)
 	if err != nil {
 
-		utils.ErrorResponse(w, errors.Internalf("error to parser query params: %v", err))
+		utils.ErrorResponse(w, err)
 		return
 	}
 
@@ -643,7 +662,7 @@ func (s *SimulationHandler) FindByIdSimulation(w http.ResponseWriter, r *http.Re
 	simu, err := s.service.FindByIdSimulation(id, tenant)
 	if err != nil {
 
-		utils.ErrorResponse(w, errors.Internalf("error to parser query params: %v", err))
+		utils.ErrorResponse(w, err)
 		return
 	}
 
@@ -702,7 +721,7 @@ func (s *SimulationHandler) UpdateSetup(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	newSetup := &dto.SetupRequest{}
+	newSetup := dto.SetupRequest{}
 
 	err = json.NewDecoder(r.Body).Decode(&newSetup)
 	if err != nil {
@@ -710,7 +729,14 @@ func (s *SimulationHandler) UpdateSetup(w http.ResponseWriter, r *http.Request) 
 		utils.ErrorResponse(w, errors.UnprocessableEntityf("unprocessable entity error: %v", err))
 		return
 	}
-	error := utils.ValidateStruct(&newSetup)
+	error := utils.ValidateStruct(newSetup)
+	if error != nil {
+		//logar error
+		utils.ErrorResponse(w, errors.BadRequestf("bad request error: %v", err))
+		return
+	}
+
+	error = utils.Validate(newSetup)
 	if error != nil {
 		//logar error
 		utils.ErrorResponse(w, errors.BadRequestf("bad request error: %v", err))
@@ -724,7 +750,7 @@ func (s *SimulationHandler) UpdateSetup(w http.ResponseWriter, r *http.Request) 
 	}, tenant)
 	if err != nil {
 
-		utils.ErrorResponse(w, errors.Internalf("error to parser query params: %v", err))
+		utils.ErrorResponse(w,  err)
 		return
 	}
 
@@ -781,7 +807,7 @@ func (s *SimulationHandler) UpdateSimulation(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	newSimu := &dto.SimulationRequest{}
+	newSimu := dto.SimulationRequest{}
 
 	err = json.NewDecoder(r.Body).Decode(&newSimu)
 	if err != nil {
@@ -789,7 +815,14 @@ func (s *SimulationHandler) UpdateSimulation(w http.ResponseWriter, r *http.Requ
 		utils.ErrorResponse(w, errors.UnprocessableEntityf("unprocessable entity error: %v", err))
 		return
 	}
-	error := utils.ValidateStruct(&newSimu)
+	error := utils.ValidateStruct(newSimu)
+	if error != nil {
+		//logar error
+		utils.ErrorResponse(w, errors.BadRequestf("bad request error: %v", err))
+		return
+	}
+
+	error = utils.Validate(newSimu)
 	if error != nil {
 		//logar error
 		utils.ErrorResponse(w, errors.BadRequestf("bad request error: %v", err))
@@ -922,7 +955,7 @@ func (s *SimulationHandler) HealthCheckHandler(w http.ResponseWriter, r *http.Re
 
 		_, err = w.Write([]byte(fmt.Sprintf(`{"status": "DOWN", "error": "%v"}`, err)))
 		if err != nil {
-			fmt.Println("error %v", err)
+			utils.ErrorResponse(w, err)
 		}
 		return
 	}

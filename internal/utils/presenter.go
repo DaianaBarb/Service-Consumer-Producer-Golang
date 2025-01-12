@@ -60,6 +60,16 @@ func ErrorResponse(w http.ResponseWriter, err error) {
 		return
 	}
 
+	if errors.IsUnauthorized(err) {
+		w.WriteHeader(http.StatusUnauthorized)
+		encodeErr := json.NewEncoder(w).Encode(ResponseDefault{Message: err.Error()})
+		if encodeErr != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		return
+	}
+
 	w.WriteHeader(http.StatusInternalServerError)
 	_ = json.NewEncoder(w).Encode(ResponseDefault{Message: "internal server error: " + err.Error()})
 }

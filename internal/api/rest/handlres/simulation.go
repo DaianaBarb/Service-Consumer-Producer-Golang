@@ -215,7 +215,7 @@ func (s *SimulationHandler) CreatedBorrower(w http.ResponseWriter, r *http.Reque
 
 	ctx := context.Background()
 	ctx = context.WithValue(ctx, "generatJWT", r.Header.Get("X-User"))
-	user := r.Header.Get("X-User")
+	user := r.Header.Get("X-User-ID")
 	tenant := r.Header.Get("X-tenant-ID")
 	w.Header().Set("Content-Type", "application/json")
 
@@ -292,7 +292,7 @@ func (s *SimulationHandler) CreatedSetup(w http.ResponseWriter, r *http.Request)
 
 	ctx := context.Background()
 	ctx = context.WithValue(ctx, "generatJWT", r.Header.Get("X-User"))
-	user := r.Header.Get("X-User")
+	user := r.Header.Get("X-User-ID")
 	tenant := r.Header.Get("X-tenant-ID")
 	w.Header().Set("Content-Type", "application/json")
 
@@ -367,7 +367,7 @@ func (s *SimulationHandler) CreatedSetup(w http.ResponseWriter, r *http.Request)
 func (s *SimulationHandler) CreatedSimulation(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
 	ctx = context.WithValue(ctx, "generatJWT", r.Header.Get("X-User"))
-	user := r.Header.Get("X-User")
+	user := r.Header.Get("X-User-ID")
 	tenant := r.Header.Get("X-tenant-ID")
 	w.Header().Set("Content-Type", "application/json")
 
@@ -455,7 +455,7 @@ func (s *SimulationHandler) CreatedSimulation(w http.ResponseWriter, r *http.Req
 func (s *SimulationHandler) FindByIdBorrower(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
 	ctx = context.WithValue(ctx, "generatJWT", r.Header.Get("X-User"))
-	user := r.Header.Get("X-User")
+	user := r.Header.Get("X-User-ID")
 	tenant := r.Header.Get("X-tenant-ID")
 	w.Header().Set("Content-Type", "application/json")
 
@@ -538,7 +538,7 @@ func (s *SimulationHandler) FindByIdBorrower(w http.ResponseWriter, r *http.Requ
 func (s *SimulationHandler) FindByIdSetup(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
 	ctx = context.WithValue(ctx, "generatJWT", r.Header.Get("X-User"))
-	user := r.Header.Get("X-User")
+	user := r.Header.Get("X-User-ID")
 	tenant := r.Header.Get("X-tenant-ID")
 	w.Header().Set("Content-Type", "application/json")
 
@@ -620,7 +620,7 @@ func (s *SimulationHandler) FindByIdSetup(w http.ResponseWriter, r *http.Request
 func (s *SimulationHandler) FindByIdSimulation(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
 	ctx = context.WithValue(ctx, "generatJWT", r.Header.Get("X-User"))
-	user := r.Header.Get("X-User")
+	user := r.Header.Get("X-User-ID")
 	tenant := r.Header.Get("X-tenant-ID")
 	w.Header().Set("Content-Type", "application/json")
 
@@ -689,7 +689,7 @@ func (s *SimulationHandler) FindByIdSimulation(w http.ResponseWriter, r *http.Re
 func (s *SimulationHandler) UpdateSetup(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
 	ctx = context.WithValue(ctx, "generatJWT", r.Header.Get("X-User"))
-	user := r.Header.Get("X-User")
+	user := r.Header.Get("X-User-ID")
 	tenant := r.Header.Get("X-tenant-ID")
 	w.Header().Set("Content-Type", "application/json")
 
@@ -769,7 +769,7 @@ func (s *SimulationHandler) UpdateSetup(w http.ResponseWriter, r *http.Request) 
 func (s *SimulationHandler) UpdateSimulation(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
 	ctx = context.WithValue(ctx, "generatJWT", r.Header.Get("X-User"))
-	user := r.Header.Get("X-User")
+	user := r.Header.Get("X-User-ID")
 	tenant := r.Header.Get("X-tenant-ID")
 	w.Header().Set("Content-Type", "application/json")
 
@@ -863,7 +863,7 @@ func (s *SimulationHandler) UpdateSimulation(w http.ResponseWriter, r *http.Requ
 func (s *SimulationHandler) BorrowerResponseToSimulation(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
 	ctx = context.WithValue(ctx, "generatJWT", r.Header.Get("X-User"))
-	user := r.Header.Get("X-User")
+	user := r.Header.Get("X-User-ID")
 	tenant := r.Header.Get("X-tenant-ID")
 	w.Header().Set("Content-Type", "application/json")
 

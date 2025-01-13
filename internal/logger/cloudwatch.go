@@ -20,7 +20,7 @@ var (
 )
 
 type ILogCloudWatch interface {
-	SendLog(level, message string)
+	SendLog(level, message string, schema string)
 }
 
 type CloudWatch struct {
@@ -35,11 +35,12 @@ func NewCloudWatch(cli *cloudwatchlogs.Client) ILogCloudWatch {
 }
 
 // Função para enviar logs ao CloudWatch
-func (c *CloudWatch) SendLog(level, message string) {
+func (c *CloudWatch) SendLog(level, message string, schema string) {
 	// Formata o log como JSON
 	logEntry := model.LogEntry{
 		Level:     level,
 		Message:   message,
+		Schema:    schema,
 		Timestamp: time.Now().Format(time.RFC3339),
 	}
 	logData, err := json.Marshal(logEntry)

@@ -53,6 +53,12 @@ func NewRepository(db *sql.DB, log logger.ILogCloudWatch) IRepository {
 }
 
 func (r *Repository) CreatedSimulation(simu *entity.Simulation, schema string) (*entity.Simulation, error) {
+
+	err := r.setSchema(context.TODO(), schema)
+	if err != nil {
+		r.logger.SendLog("ERROR", err.Error(), schema)
+		return nil, err
+	}
 	var simula entity.Simulation
 
 	var SimulationId uuid.UUID
@@ -66,7 +72,7 @@ func (r *Repository) CreatedSimulation(simu *entity.Simulation, schema string) (
 	// 	return err
 	// }
 
-	err := r.db.QueryRow(
+	err = r.db.QueryRow(
 		query,
 		simu.BorrowerId,
 		simu.LoanValue,
@@ -85,27 +91,41 @@ func (r *Repository) CreatedSimulation(simu *entity.Simulation, schema string) (
 	)
 
 	if err != nil {
+		r.logger.SendLog("ERROR", err.Error(), schema)
 		return nil, err
 	}
 	simu.SimulationId = SimulationId.String()
-
+	r.logger.SendLog("INFO", "simulation created sucess"+simu.SimulationId, schema)
 	return simu, nil
 
 }
 
 func (r *Repository) CreatedBorrower(tom *entity.Borrower, schema string) error {
+
+	err := r.setSchema(context.TODO(), schema)
+	if err != nil {
+		r.logger.SendLog("ERROR", err.Error(), schema)
+		return err
+	}
 	query := `
 	INSERT INTO borrower ( name, phone, email, cpf,created_at, updated_at)
 	VALUES ($1, $2, $3, $4, NOW(), NOW())
 `
 
-	_, err := r.db.Exec(query, tom.Name, tom.Phone, tom.Email, tom.Cpf)
+	_, err = r.db.Exec(query, tom.Name, tom.Phone, tom.Email, tom.Cpf)
 	if err != nil {
+		r.logger.SendLog("ERROR", err.Error(), schema)
 		return err
 	}
+	r.logger.SendLog("INFO", "Borrower created sucess"+tom.Name, schema)
 	return nil
 }
 func (r *Repository) CreatedSetup(set *entity.Setup, schema string) error {
+	err := r.setSchema(context.TODO(), schema)
+	if err != nil {
+		r.logger.SendLog("ERROR", err.Error(), schema)
+		return err
+	}
 	set.Escope = "escope"
 	set.EscopeIsValid = true
 	query := `
@@ -113,16 +133,22 @@ func (r *Repository) CreatedSetup(set *entity.Setup, schema string) error {
 	VALUES ($1, $2, $3,$4, $5, $6, NOW(), NOW())
 `
 
-	_, err := r.db.Exec(query, os.Getenv("SETUP_ID"), set.Capital, set.Fees, set.InterestRate, set.Escope, set.EscopeIsValid)
+	_, err = r.db.Exec(query, os.Getenv("SETUP_ID"), set.Capital, set.Fees, set.InterestRate, set.Escope, set.EscopeIsValid)
 	if err != nil {
+		r.logger.SendLog("ERROR", err.Error(), schema)
 		return err
 	}
-
+	r.logger.SendLog("INFO", "Setup created sucess"+set.SetupId, schema)
 	return nil
 
 }
 
 func (r *Repository) UpdateSimulation(simu *entity.Simulation, schema string) error {
+	err := r.setSchema(context.TODO(), schema)
+	if err != nil {
+		r.logger.SendLog("ERROR", err.Error(), schema)
+		return err
+	}
 
 	query := `
 		UPDATE simulations 
@@ -130,27 +156,45 @@ func (r *Repository) UpdateSimulation(simu *entity.Simulation, schema string) er
 		WHERE id = $6
 	`
 
-	_, err := r.db.Exec(query, simu.Status, simu.BorrowerId, simu.LoanValue, simu.NumberOfInstallments, simu.InterestRate, simu.SimulationId)
-	return err
+	_, err = r.db.Exec(query, simu.Status, simu.BorrowerId, simu.LoanValue, simu.NumberOfInstallments, simu.InterestRate, simu.SimulationId)
+
+	if err != nil {
+		r.logger.SendLog("ERROR", err.Error(), schema)
+		return err
+	}
+
+	r.logger.SendLog("INFO", "update simnulation sucess"+simu.SimulationId, schema)
+	return nil
 }
 
 func (r *Repository) UpdateSetup(setupId string, newSetup *entity.Setup, schema string) error {
-
+	err := r.setSchema(context.TODO(), schema)
+	if err != nil {
+		r.logger.SendLog("ERROR", err.Error(), schema)
+		return err
+	}
 	query := `
 	UPDATE setup 
 	SET capital = $1, fees = $2, interest_rate = $3, updated_at = NOW() 
 	WHERE id = $4
 `
 
-	_, err := r.db.Exec(query, newSetup.Capital, newSetup.Fees, newSetup.InterestRate, setupId)
+	_, err = r.db.Exec(query, newSetup.Capital, newSetup.Fees, newSetup.InterestRate, setupId)
 
 	if err != nil {
+		r.logger.SendLog("ERROR", err.Error(), schema)
 		return err
 	}
+	r.logger.SendLog("INFO", "setup update sucess"+newSetup.SetupId, schema)
 	return nil
 }
 
 func (r *Repository) FindByIdSimulation(simulationId string, schema string) (*entity.Simulation, error) {
+	err := r.setSchema(context.TODO(), schema)
+	if err != nil {
+		r.logger.SendLog("ERROR", err.Error(), schema)
+		return nil, err
+	}
 	simulation := entity.Simulation{}
 
 	query := `
@@ -160,7 +204,7 @@ func (r *Repository) FindByIdSimulation(simulationId string, schema string) (*en
 `
 	row := r.db.QueryRow(query, simulationId)
 
-	err := row.Scan(
+	err = row.Scan(
 		&simulation.SimulationId,
 		&simulation.BorrowerId,
 		&simulation.LoanValue,
@@ -172,15 +216,23 @@ func (r *Repository) FindByIdSimulation(simulationId string, schema string) (*en
 	)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
+			r.logger.SendLog("ERROR", err.Error(), schema)
 			return nil, fmt.Errorf("simulação com ID %s não encontrada", simulationId)
 		}
+		r.logger.SendLog("ERROR", err.Error(), schema)
 		return nil, err
 	}
+
+	r.logger.SendLog("INFO", "find by simulation  sucess"+simulationId, schema)
 	return &simulation, nil
 
 }
 func (r *Repository) FindByIdSetup(setupId string, schema string) (*entity.Setup, error) {
-
+	err := r.setSchema(context.TODO(), schema)
+	if err != nil {
+		r.logger.SendLog("ERROR", err.Error(), schema)
+		return nil, err
+	}
 	if config, ok := tenantConfigCache.Load(setupId); ok {
 		return config.(*entity.Setup), nil
 	}
@@ -194,7 +246,7 @@ func (r *Repository) FindByIdSetup(setupId string, schema string) (*entity.Setup
 `
 	row := r.db.QueryRow(query, setupId)
 
-	err := row.Scan(
+	err = row.Scan(
 		&setup.SetupId,
 		&setup.Capital,
 		&setup.Fees,
@@ -206,17 +258,23 @@ func (r *Repository) FindByIdSetup(setupId string, schema string) (*entity.Setup
 	)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
+			r.logger.SendLog("ERROR", err.Error(), schema)
 			return nil, fmt.Errorf("setup com ID %s não encontrada", setupId)
 		}
 
 		tenantConfigCache.Store(setupId, setup)
+		r.logger.SendLog("ERROR", err.Error(), schema)
 		return nil, err
 	}
-
+	r.logger.SendLog("INFO", "find by setup  sucess"+setupId, schema)
 	return &setup, nil
 }
 func (r *Repository) FindByIdBorrower(borrwerId string, schema string) (*entity.Borrower, error) {
-
+	err := r.setSchema(context.TODO(), schema)
+	if err != nil {
+		r.logger.SendLog("ERROR", err.Error(), schema)
+		return nil, err
+	}
 	borrwer := entity.Borrower{}
 
 	query := `
@@ -226,7 +284,7 @@ func (r *Repository) FindByIdBorrower(borrwerId string, schema string) (*entity.
 `
 	row := r.db.QueryRow(query, borrwerId)
 
-	err := row.Scan(
+	err = row.Scan(
 		&borrwer.BorrowerId,
 		&borrwer.Name,
 		&borrwer.Phone,
@@ -237,16 +295,24 @@ func (r *Repository) FindByIdBorrower(borrwerId string, schema string) (*entity.
 	)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
+			r.logger.SendLog("ERROR", err.Error(), schema)
 			return nil, fmt.Errorf("borrwer  com ID %s não encontrada", borrwerId)
 		}
+		r.logger.SendLog("ERROR", err.Error(), schema)
 		return nil, err
 	}
-
+	r.logger.SendLog("INFO", "find by id borrwer sucess"+borrwerId, schema)
 	return &borrwer, nil
 
 }
 
 func (r *Repository) GetSimulations(param *model.Params, schema string) ([]entity.Simulation, error) {
+
+	err := r.setSchema(context.TODO(), schema)
+	if err != nil {
+		r.logger.SendLog("ERROR", err.Error(), schema)
+		return nil, err
+	}
 
 	offset := (param.Page - 1) * param.PageSize
 	var SimulationId uuid.UUID
@@ -299,6 +365,7 @@ func (r *Repository) GetSimulations(param *model.Params, schema string) ([]entit
 	// Executa a consulta
 	rows, err := r.db.Query(query, args...)
 	if err != nil {
+		r.logger.SendLog("ERROR", err.Error(), schema)
 		return nil, err
 	}
 	defer rows.Close()
@@ -309,12 +376,13 @@ func (r *Repository) GetSimulations(param *model.Params, schema string) ([]entit
 
 		var sim entity.Simulation
 		if err := rows.Scan(&SimulationId, &sim.BorrowerId, &sim.InterestRate, &sim.Status, &sim.LoanValue, &sim.NumberOfInstallments, &sim.CreatedAt, &sim.UpdatedAt); err != nil {
+			r.logger.SendLog("ERROR", err.Error(), schema)
 			return nil, err
 		}
 		sim.SimulationId = SimulationId.String()
 		simulations = append(simulations, sim)
 	}
-
+	r.logger.SendLog("INFO", "find by simulations sucess", schema)
 	return simulations, nil
 }
 
@@ -322,9 +390,10 @@ func (r *Repository) setSchema(ctx context.Context, schema string) error {
 	// schema e igual ao schema do tenant
 	_, err := r.db.ExecContext(ctx, "SET search_path TO %s", schema)
 	if err != nil {
+		r.logger.SendLog("ERROR", err.Error(), schema)
 		return err
 	}
-
+	r.logger.SendLog("INFO", "schema set sucess "+schema, schema)
 	return nil
 
 }

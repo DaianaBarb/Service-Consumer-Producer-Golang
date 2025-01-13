@@ -43,6 +43,7 @@ type Setup struct {
 type LogEntry struct {
 	Level     string `json:"level"`
 	Message   string `json:"message"`
+	Schema    string `json:"schema"`
 	Timestamp string `json:"timestamp"`
 }
 
